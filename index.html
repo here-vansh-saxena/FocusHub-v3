@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Focus Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800&family=Quicksand:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700;800&family=Lora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Fira+Code:wght@400;500;700&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1020;--text:#eef0ff;--muted:#9aa3c7;--accent:#7c5cff;--accent2:#22d3ee;--glass:rgba(255,255,255,.06);--line:rgba(255,255,255,.09);--radius:20px;--font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--blur:20px;--ringw:12;--pad:22px}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:var(--font);font-size:15px;line-height:1.45;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;transition:background .5s,color .5s}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:550;background:var(--glass);transition:transform .15s,box-shadow .2s,background .2s,border-color .2s}
+button:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--accent) 50%,var(--line))}button:active{transform:scale(.97)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+button.pri{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff;font-weight:650;box-shadow:0 10px 28px -10px var(--accent)}
+button.danger{color:#f87171}
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=color],textarea,select{width:100%;background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:10px 12px;outline:none;transition:border-color .2s,box-shadow .2s}
+input[type=color]{padding:3px;height:42px;cursor:pointer}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+input[type=range]{width:100%;accent-color:var(--accent)}input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px;flex:none}
+select option{background:var(--bg);color:var(--text)}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;filter:blur(80px);opacity:.5}
+.bg i{position:absolute;width:48vmax;height:48vmax;border-radius:50%;background:var(--accent);animation:float 24s ease-in-out infinite alternate;transition:background .8s}
+.bg i:nth-child(2){background:var(--accent2);left:55%;top:35%;animation-duration:31s}.bg i:nth-child(3){background:var(--accent);left:-10%;top:60%;animation-duration:27s}
+body.still .bg i,body[data-bg=mesh] .bg i{animation:none}body[data-bg=plain] .bg,body[data-bg=grid] .bg i{display:none}
+body[data-bg=grid]{background-image:radial-gradient(60vmax 40vmax at 85% -10%,color-mix(in srgb,var(--accent) 24%,transparent),transparent),linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:auto,44px 44px,44px 44px;background-attachment:fixed}
+@keyframes float{to{transform:translate(14vw,-10vh) scale(1.15)}}
+.app{display:flex;min-height:100vh}
+.side{position:sticky;top:0;height:100vh;width:236px;flex:none;display:flex;flex-direction:column;gap:22px;padding:22px 14px;border-right:1px solid var(--line);background:var(--glass);backdrop-filter:blur(var(--blur)) saturate(150%);-webkit-backdrop-filter:blur(var(--blur)) saturate(150%);z-index:30}
+.logo{display:flex;align-items:center;gap:11px;padding:0 8px;font-weight:800;font-size:19px;letter-spacing:-.03em}
+.logo i{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;box-shadow:0 8px 24px -8px var(--accent)}
+.logo svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round}
+nav{display:flex;flex-direction:column;gap:3px}
+nav button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:transparent;border:0;border-radius:12px;padding:10px 12px;color:var(--muted);font-weight:550;position:relative}
+nav button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+nav button:hover{background:var(--glass);color:var(--text);transform:none}
+nav button.on{color:var(--text);background:color-mix(in srgb,var(--accent) 18%,transparent)}nav button.on svg{stroke:var(--accent2)}
+nav button.on:before{content:"";position:absolute;left:-14px;top:9px;bottom:9px;width:3px;border-radius:3px;background:linear-gradient(var(--accent),var(--accent2))}
+.sidefoot{margin-top:auto;font-size:12px;color:var(--muted);padding:0 8px}
+body.mini .side{width:76px}body.mini nav button span,body.mini .logo b,body.mini .sidefoot{display:none}body.mini nav button{justify-content:center}body.mini .logo{justify-content:center;padding:0}
+.content{flex:1;min-width:0}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:24px 32px 6px;max-width:1280px;margin:auto}
+.top h1{margin:0;font-size:27px;letter-spacing:-.035em;font-weight:780;flex:1;min-width:140px}
+.goal{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);min-width:190px}
+.gbar{flex:1;height:8px;border-radius:99px;background:var(--glass);border:1px solid var(--line);overflow:hidden}.gbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s}
+main{max-width:1280px;margin:auto;padding:14px 32px 80px}
+.view{display:none;gap:18px}.view.on{display:grid}.two{grid-template-columns:1.1fr .9fr}
+.bento{grid-template-columns:repeat(2,minmax(0,1fr))}.full{grid-column:1/-1}
+#relax.on{grid-template-columns:1.35fr 1fr}
+@media(max-width:900px){.two,.bento,#relax.on{grid-template-columns:1fr}}
+@media(max-width:860px){.app{flex-direction:column}
+.side{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;width:100%!important;flex-direction:row;padding:6px 6px calc(6px + env(safe-area-inset-bottom));border-right:0;border-top:1px solid var(--line);background:color-mix(in srgb,var(--bg) 85%,transparent);gap:0}
+.logo,.sidefoot{display:none}nav{flex-direction:row;width:100%}nav button{flex-direction:column;gap:3px;padding:7px 1px;font-size:10px;justify-content:center;align-items:center;flex:1;min-width:0}
+body.mini nav button span{display:block}nav button.on:before{display:none}
+.top{padding:16px 16px 2px}main{padding:10px 14px 100px}}
+.card{position:relative;background:var(--glass);backdrop-filter:blur(var(--blur)) saturate(140%);-webkit-backdrop-filter:blur(var(--blur)) saturate(140%);border:1px solid var(--line);border-radius:var(--radius);padding:var(--pad);min-width:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 30px 60px -36px rgba(0,0,0,.55)}
+body.compact{--pad:14px}body.compact .view{gap:12px}
+.card h3{margin:0 0 16px;font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.13em;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hero{background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 24%,transparent),color-mix(in srgb,var(--accent2) 12%,transparent)),var(--glass)}
+.hero h1{font-size:clamp(28px,4.4vw,42px);margin:4px 0 8px;letter-spacing:-.04em;font-weight:800}
+.muted{color:var(--muted);font-size:13px}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.chip{padding:7px 14px;border-radius:999px;font-size:13px;color:var(--muted)}
+.chip.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+.timer{display:flex;flex-direction:column;align-items:center;gap:18px}
+.ring{position:relative;width:320px;height:320px;max-width:100%}.ring svg{transform:rotate(-90deg);width:100%;height:100%;overflow:visible}
+.ring circle{stroke-width:var(--ringw)}.ring .bg2{stroke:var(--line)}
+.ring .fg{stroke-linecap:round;transition:stroke-dashoffset .25s linear,stroke .4s;filter:drop-shadow(0 0 14px color-mix(in srgb,var(--accent) 55%,transparent))}
+.ring .time{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.time b{font-size:64px;font-variant-numeric:tabular-nums;letter-spacing:-.04em;font-weight:750}
+.ctrl{display:flex;gap:10px}.ctrl button{min-width:110px;padding:13px 18px}
+.pulse{animation:pulse 2s ease-in-out infinite}@keyframes pulse{50%{transform:scale(1.02)}}
+.label{color:var(--muted);font-size:14px}.stack{display:flex;flex-direction:column;gap:12px;width:100%}
+.zclock,.zx{display:none}
+body.zen .side,body.zen .top{display:none}body.zen #focus>.card:not(.timer){display:none}
+body.zen #focus.on{grid-template-columns:1fr;min-height:90vh;align-content:center}
+body.zen .timer{background:transparent;border:0;box-shadow:none;backdrop-filter:none}
+body.zen .ring{width:min(70vmin,480px);height:min(70vmin,480px)}body.zen .time b{font-size:min(14vmin,96px)}
+body.zen .zclock{display:block;font-size:18px;color:var(--muted);letter-spacing:.25em}body.zen .zx{display:block;position:fixed;top:18px;right:18px;z-index:60}
+.add{display:grid;grid-template-columns:1fr 110px 110px auto;gap:8px;margin-bottom:12px}@media(max-width:600px){.add{grid-template-columns:1fr 1fr}}
+.task,.li{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:var(--glass);border:1px solid var(--line);margin-bottom:8px;transition:border-color .2s,opacity .2s,transform .2s}
+.li{font-size:14px;cursor:pointer;padding:10px 12px}.task:hover,.li:hover{transform:translateX(2px)}
+.task.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}.task.done{opacity:.55}.task.done .tt{text-decoration:line-through}
+.task .tt{flex:1;min-width:0;word-break:break-word;cursor:text}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.pill{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--glass);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.task button{padding:6px 10px;font-size:12px}
+.bars{display:flex;gap:12px;height:210px;margin-top:4px}.bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}
+.track{flex:1;width:100%;display:flex;align-items:flex-end}
+.bar i{width:100%;display:block;border-radius:10px 10px 5px 5px;background:linear-gradient(180deg,var(--accent2),var(--accent));transition:height .7s cubic-bezier(.2,.8,.2,1);box-shadow:0 8px 20px -8px var(--accent)}.bar small{font-size:11px;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:6px}.two .kpis{grid-template-columns:repeat(2,1fr)}@media(max-width:600px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}.kpi small{color:var(--muted);font-size:12px}.kpi b{font-size:25px;display:block;margin-top:4px;font-weight:760;letter-spacing:-.02em}
+.prog{height:8px;background:var(--glass);border:1px solid var(--line);border-radius:99px;overflow:hidden;margin:12px 0 16px}.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.dayc{min-width:70px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 8px 14px;position:relative;overflow:hidden;background:var(--glass)}
+.dayc.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}.dayc.today{outline:2px solid var(--accent2);outline-offset:-2px}
+.dayc small{font-size:12px;opacity:.85}.dayc b{font-size:19px}.dayc i{position:absolute;left:0;bottom:0;height:3px;background:#34d399;transition:width .4s}
+.heat{display:grid;grid-template-rows:repeat(7,1fr);grid-auto-flow:column;grid-auto-columns:1fr;gap:5px}.heat div{aspect-ratio:1;border-radius:5px;background:var(--glass);border:1px solid var(--line)}
+.sub{margin-bottom:12px}.sub .r{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}.sub .b{height:8px;border-radius:99px;background:var(--glass);overflow:hidden}.sub .b i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.note{padding:10px 12px;border-radius:12px;background:var(--glass);border:1px solid var(--line);margin-bottom:8px;font-size:14px}
+.themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px}
+.theme{padding:10px;text-align:left;display:flex;flex-direction:column;gap:8px}.theme.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}.theme span{height:40px;border-radius:10px;display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.sw-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.pal{width:34px;height:34px;padding:0;border-radius:50%;border:2px solid var(--line)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,160%);background:var(--text);color:var(--bg);padding:12px 20px;border-radius:14px;font-size:14px;transition:transform .4s cubic-bezier(.2,.8,.2,1);z-index:90;max-width:90vw;box-shadow:0 20px 40px -10px rgba(0,0,0,.4)}
+#toast.show{transform:translate(-50%,0)}@media(max-width:860px){#toast{bottom:84px}}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:50}
+details summary{cursor:pointer;font-weight:700;list-style:none}details summary::-webkit-details-marker{display:none}
+body.still *{transition-duration:0s!important}
+.breath{height:250px;display:grid;place-items:center;position:relative}
+#bCircle{width:190px;height:190px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--accent2),var(--accent));opacity:.88;transform:scale(.5);box-shadow:0 0 60px color-mix(in srgb,var(--accent) 50%,transparent)}
+#bTxt{position:absolute;font-weight:700;font-size:20px;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+#pal{position:fixed;inset:0;display:none;align-items:flex-start;justify-content:center;padding-top:14vh;background:rgba(0,0,0,.5);z-index:80;backdrop-filter:blur(5px)}#pal.on{display:flex}
+.pbox{width:min(560px,92vw);background:var(--bg);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 40px 80px -20px rgba(0,0,0,.6)}
+#palQ{border:0;border-radius:0;padding:16px 18px;font-size:16px;border-bottom:1px solid var(--line);background:transparent}#palQ:focus{box-shadow:none}
+#palList{max-height:340px;overflow:auto;padding:6px}.pi{padding:10px 12px;border-radius:10px;cursor:pointer;font-size:14px}.pi.on{background:color-mix(in srgb,var(--accent) 20%,transparent)}
+.cal-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.cal-bar h2{margin:0 8px;font-size:22px;font-weight:750;letter-spacing:-.02em;min-width:190px}
+.seg{display:flex;gap:3px;background:var(--glass);border:1px solid var(--line);padding:3px;border-radius:999px}
+.seg button{border:0;background:transparent;padding:6px 14px;border-radius:999px;color:var(--muted)}.seg button.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.cal-layout{grid-template-columns:1fr 290px}@media(max-width:1000px){.cal-layout{grid-template-columns:1fr}}
+.mg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.mg>div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-height:104px;padding:4px;overflow:hidden;cursor:pointer;transition:background .15s}
+.mg>div:hover{background:var(--glass)}.mg .dh{min-height:0;padding:7px;text-align:center;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;cursor:default}
+.mg .out{opacity:.4}.dn{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%;font-size:13px;margin-bottom:2px}
+.today .dn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700}
+.ev{display:block;font-size:11.5px;padding:2px 6px;border-radius:6px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;cursor:pointer}
+.ev.hol{background:color-mix(in srgb,#34d399 22%,transparent);color:#34d399;border-left:3px solid #34d399}.ev.hol.o{background:color-mix(in srgb,#fbbf24 16%,transparent);color:#fbbf24;border-left-color:#fbbf24}
+.ev.done{opacity:.5;text-decoration:line-through}.more{font-size:11px;color:var(--muted);padding-left:4px}
+.wk{overflow:auto;max-height:640px;border:1px solid var(--line);border-radius:12px}
+.wh{display:grid;position:sticky;top:0;z-index:3;background:var(--bg);border-bottom:1px solid var(--line)}
+.wh>div{padding:6px;border-left:1px solid var(--line);min-height:54px;font-size:12px;color:var(--muted)}.wh .dn{font-size:15px;width:30px;height:30px}
+.wb{display:grid;position:relative}.wb .hr{height:48px;border-top:1px solid var(--line);font-size:10px;color:var(--muted);padding:0 6px;text-align:right}
+.wb .col{position:relative;border-left:1px solid var(--line);cursor:pointer}.wb .col .sl{height:48px;border-top:1px solid var(--line)}
+.wb .ev{position:absolute;left:2px;right:2px;margin:0;padding:3px 5px;overflow:hidden;white-space:normal;line-height:1.2;z-index:2}
+.now{position:absolute;left:0;right:0;height:2px;background:#f87171;z-index:4;pointer-events:none}.now:before{content:"";position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:#f87171}
+.up{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer}.up i{width:4px;border-radius:4px;flex:none}.up small{color:var(--muted);display:block}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:70;padding:14px;backdrop-filter:blur(4px)}
+#modal.on{display:flex}#modal .card{width:min(480px,100%);max-height:92vh;overflow:auto;background:var(--bg)}
+#galaxy{width:100%;height:min(62vh,560px);display:block;border-radius:14px;background:#02030a;cursor:crosshair;touch-action:none}
+.mix{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.snd{padding:16px;border-radius:calc(var(--radius)*.7);background:var(--glass);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.snd.on{border-color:var(--accent)}.snd b{font-size:16px}
+/* ---- v3 fixes ---- */
+body{overflow-x:clip}
+#toast{opacity:0;visibility:hidden;pointer-events:none;transform:translate(-50%,16px);transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .25s,visibility .25s}
+#toast.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.bg{filter:none;opacity:1}
+.bg i{width:70vmax;height:70vmax;left:-15vmax;top:-20vmax;background:radial-gradient(circle,var(--accent) 0%,transparent 62%);opacity:.4;animation:drift1 calc(var(--bgd,1)*26s) ease-in-out infinite alternate;will-change:transform}
+.bg i:nth-child(2){background:radial-gradient(circle,var(--accent2) 0%,transparent 62%);left:auto;right:-20vmax;top:20vh;animation:drift2 calc(var(--bgd,1)*32s) ease-in-out infinite alternate}
+.bg i:nth-child(3){background:radial-gradient(circle,var(--accent) 0%,transparent 62%);left:10vw;top:auto;bottom:-30vmax;opacity:.3;animation:drift3 calc(var(--bgd,1)*38s) ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate(35vw,25vh) scale(1.25)}}@keyframes drift2{to{transform:translate(-40vw,-20vh) scale(.85)}}@keyframes drift3{to{transform:translate(30vw,-35vh) scale(1.2)}}
+body.still .bg i,body[data-bg=mesh] .bg i{animation:none}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+.view.on>.card{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}.view.on>.card:nth-child(2){animation-delay:.05s}.view.on>.card:nth-child(3){animation-delay:.1s}.view.on>.card:nth-child(n+4){animation-delay:.15s}
+body.still .view.on>.card{animation:none}
+#galaxy,#fluid{width:100%;height:min(60vh,540px);display:block;border-radius:14px;background:#02030a;cursor:crosshair;touch-action:none}
+.card.fs{position:fixed;inset:0;z-index:85;border-radius:0;display:flex;flex-direction:column;background:#02030a;animation:none}
+.card.fs canvas{flex:1;height:auto;min-height:0;border-radius:0}body.fsm{overflow:hidden}
+.agenda{display:none}
+.mg .sel .dn{outline:2px solid var(--accent2)}
+body.zen #focus.on{min-height:100dvh}
+@media(max-width:860px){
+.card,.side{backdrop-filter:none;-webkit-backdrop-filter:none}
+.top{gap:8px}.top h1{font-size:22px}.goal{order:5;width:100%;min-width:0}
+#palBtn,#zenBtn{padding:8px 11px;font-size:13px}
+.ring{width:min(300px,76vw);height:auto;aspect-ratio:1}.time b{font-size:clamp(44px,15vw,60px)}
+.ctrl{width:100%}.ctrl button{min-width:0;flex:1}
+input,select,textarea{font-size:16px}button{min-height:40px}
+.add>:first-child{grid-column:1/-1}
+.cal-bar h2{order:-1;flex:1 1 100%;min-width:0;margin:0;font-size:20px}.cal-bar .seg{flex:1}.cal-bar .seg button{flex:1;padding:6px 4px}
+.cal-layout{grid-template-columns:1fr!important}
+.agenda{display:block;margin-top:14px}
+.mg>div{min-height:60px;padding:3px}
+.mg .ev{display:inline-block;font-size:0;width:6px;height:6px;padding:0;margin:1px;border-radius:50%;border:0;pointer-events:none}
+.mg .ev.hol{background:#34d399}.mg .ev.hol.o{background:#fbbf24}.mg .more{display:none}
+#modal{align-items:flex-end;padding:0}#modal .card{width:100%;border-radius:20px 20px 0 0;max-height:94dvh}
+.wk{max-height:62dvh}.wk>div{min-width:560px!important}
+#galaxy,#fluid{height:52vh}.card.fs canvas{height:auto}
+.view{gap:12px}
+}
+/* ---- v4 design system ---- */
+:root{--hl:rgba(255,255,255,.22)}
+::selection{background:color-mix(in srgb,var(--accent) 45%,transparent)}
+*{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+body{letter-spacing:-.006em}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.04;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+button{border:0;border-radius:999px;padding:9px 17px;background:color-mix(in srgb,var(--text) 7%,transparent);box-shadow:inset 0 0 0 1px var(--line)}
+button:hover{background:color-mix(in srgb,var(--text) 11%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 55%,var(--line))}
+button.pri{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 12px 30px -12px var(--accent),inset 0 1px 0 rgba(255,255,255,.3)}
+input[type=text],input[type=number],input[type=date],input[type=time],textarea,select{border-radius:14px;background:color-mix(in srgb,var(--text) 5%,transparent)}
+.card{border:0;border-radius:calc(var(--radius) + 6px);background:linear-gradient(180deg,rgba(255,255,255,.04),transparent 45%),var(--glass);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 26px 60px -32px rgba(0,0,0,.65),0 2px 6px -2px rgba(0,0,0,.25)}
+.card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(150deg,var(--hl),transparent 38%,transparent 62%,color-mix(in srgb,var(--accent) 32%,transparent));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+body.light .card{box-shadow:0 24px 50px -30px rgba(30,41,59,.4),0 1px 2px rgba(30,41,59,.08)}
+.card h3{font-size:15px;font-weight:700;text-transform:none;letter-spacing:-.01em;color:var(--text);margin-bottom:18px}
+.card h3>span:first-child:before{content:"";display:inline-block;width:4px;height:15px;border-radius:4px;margin-right:10px;vertical-align:-2px;background:linear-gradient(var(--accent),var(--accent2))}
+.side{top:14px;height:calc(100dvh - 28px);margin:14px 0 14px 14px;border:0;border-radius:calc(var(--radius) + 8px);width:228px;padding:20px 12px;background:linear-gradient(180deg,rgba(255,255,255,.05),transparent),var(--glass);box-shadow:inset 0 0 0 1px var(--line),0 30px 60px -30px rgba(0,0,0,.6)}
+body.mini .side{width:76px}
+.logo b{font-size:18px}
+nav button{border-radius:14px;padding:11px 13px;background:transparent;box-shadow:none}
+nav button:hover{background:color-mix(in srgb,var(--text) 7%,transparent);box-shadow:none}
+nav button.on{background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 34%,transparent),color-mix(in srgb,var(--accent2) 16%,transparent));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 42%,transparent),0 12px 26px -16px var(--accent)}
+nav button.on:before{display:none}
+.top{padding:28px 34px 4px}.top h1{font-size:32px;font-weight:800;letter-spacing:-.04em}
+main{padding:16px 34px 80px}.view{gap:20px}
+.hero{overflow:hidden;padding:36px;background:radial-gradient(120% 150% at 100% 0%,color-mix(in srgb,var(--accent) 40%,transparent),transparent 60%),radial-gradient(90% 120% at 0% 100%,color-mix(in srgb,var(--accent2) 28%,transparent),transparent 60%),var(--glass)}
+.hero h1{font-size:clamp(32px,5vw,54px);font-weight:800;letter-spacing:-.045em;line-height:1.05;background:linear-gradient(90deg,var(--text),color-mix(in srgb,var(--accent2) 70%,var(--text)));-webkit-background-clip:text;background-clip:text;color:transparent}
+.kpi{border:0;border-radius:18px;box-shadow:inset 0 0 0 1px var(--line);background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 12%,transparent),transparent)}
+.kpi b{font-size:28px;background:linear-gradient(135deg,var(--text),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.timer{gap:22px;padding-block:30px}
+.timer .chips{background:color-mix(in srgb,var(--text) 6%,transparent);padding:4px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line);gap:2px}
+.timer .chip{background:transparent;box-shadow:none;padding:8px 18px}.timer .chip.on{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 20px -8px var(--accent)}
+.ring{isolation:isolate;width:min(340px,100%)}.ring::before{content:"";position:absolute;inset:-6%;border-radius:50%;z-index:-1;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 24%,transparent),transparent 65%);filter:blur(24px)}
+.ring .bg2{stroke:color-mix(in srgb,var(--text) 9%,transparent)}
+.time b{font-size:70px;font-weight:700;background:linear-gradient(180deg,var(--text),color-mix(in srgb,var(--text) 62%,transparent));-webkit-background-clip:text;background-clip:text;color:transparent}
+.ctrl button{padding:14px 20px}.ctrl .pri{min-width:140px}
+.task,.li{border:0;border-radius:16px;box-shadow:inset 0 0 0 1px var(--line);background:color-mix(in srgb,var(--text) 4%,transparent)}
+.task.active{box-shadow:inset 0 0 0 1.5px var(--accent),0 14px 30px -18px var(--accent)}
+.themes{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+.theme{border:0;border-radius:18px;padding:12px;box-shadow:inset 0 0 0 1px var(--line)}.theme span{height:56px;border-radius:12px}
+.theme.on{box-shadow:0 0 0 2px var(--accent),0 14px 30px -14px var(--accent)}
+.mg{border:0;border-radius:18px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+.mg>div:nth-child(7n){border-right:0}.mg>div:nth-last-child(-n+7){border-bottom:0}
+.ev{border-radius:7px}
+.seg{padding:4px}
+.snd{border:0;border-radius:20px;box-shadow:inset 0 0 0 1px var(--line);transition:box-shadow .3s,background .3s}
+.snd.on{background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 16%,transparent),transparent);box-shadow:inset 0 0 0 1.5px var(--accent),0 18px 40px -22px var(--accent)}
+.snd.on b::after{content:"";display:inline-block;width:15px;height:12px;margin-left:10px;vertical-align:-1px;background:linear-gradient(var(--accent2) 0 0) 0 100%/3px 100% no-repeat,linear-gradient(var(--accent2) 0 0) 6px 100%/3px 100% no-repeat,linear-gradient(var(--accent2) 0 0) 12px 100%/3px 100% no-repeat;animation:eq 1s ease-in-out infinite}
+@keyframes eq{0%,100%{background-size:3px 30%,3px 90%,3px 50%}50%{background-size:3px 90%,3px 40%,3px 100%}}
+#galaxy,#fluid{border-radius:calc(var(--radius) - 2px);box-shadow:inset 0 0 0 1px var(--line)}#fluid{height:min(64vh,600px)}
+#pal .pbox,#modal .card{border-radius:24px}
+@media(max-width:860px){
+.side{top:auto;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;right:10px;width:auto!important;height:auto;margin:0;border-radius:24px;padding:6px;box-shadow:inset 0 0 0 1px var(--line),0 20px 40px -10px rgba(0,0,0,.6);background:color-mix(in srgb,var(--bg) 84%,var(--text) 7%)}
+nav button{padding:8px 1px;border-radius:18px}nav button.on{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 42%,transparent)}
+.top{padding:18px 16px 2px}.top h1{font-size:26px}main{padding:10px 14px 118px}.view{gap:14px}
+.card{padding:18px}.hero{padding:24px}.time b{font-size:clamp(46px,15vw,62px)}
+#toast{bottom:100px}#fluid{height:50vh}
+}
+body.heavy .card,body.heavy .side{backdrop-filter:none;-webkit-backdrop-filter:none}body.heavy .bg i{animation-play-state:paused}body.heavy::after{display:none}
+#galCard,#fluCard{backdrop-filter:none;-webkit-backdrop-filter:none}
+</style>
+</head>
+<body>
+<div class="bg"><i></i><i></i><i></i></div>
+
+<div class="app">
+<aside class="side">
+  <div class="logo"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"/><path d="M12 9.5V13l2.2 1.6M9.5 2.5h5"/></svg></i><b>Focus Hub</b></div>
+  <nav>
+    <button data-v="home" class="on"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></button>
+    <button data-v="focus"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span>Focus</span></button>
+    <button data-v="planner"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M3.5 6l1 1 2-2M3.5 12l1 1 2-2M3.5 18l1 1 2-2"/></svg><span>Planner</span></button>
+    <button data-v="calendar"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Calendar</span></button>
+    <button data-v="stats"><svg viewBox="0 0 24 24"><path d="M5 21V10M12 21V4M19 21v-7"/></svg><span>Stats</span></button>
+    <button data-v="relax"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><span>Relax</span></button>
+    <button data-v="settings"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span>Settings</span></button>
+  </nav>
+  <div class="sidefoot">Press Ctrl K for commands<br>Keys 1 to 7 switch tabs</div>
+</aside>
+<div class="content">
+<div class="top">
+  <h1 id="pageT">Home</h1>
+  <div class="goal"><span id="goalTxt"></span><div class="gbar"><i id="gbar"></i></div></div>
+  <button id="palBtn" title="Command palette">Search</button><button id="zenBtn">Focus mode</button>
+</div>
+<main>
+  <section id="home" class="view on bento">
+    <div class="card hero full"><div class="muted" id="hDate"></div><h1 id="hGreet"></h1><p class="muted" id="hQuote" style="font-size:15px;margin:0 0 16px;max-width:60ch"></p>
+      <div class="row"><button class="pri" id="hStart">Start focus session</button><button id="hEvent">+ Add event</button><button id="hRelax">Relax</button></div></div>
+    <div class="card full"><h3>Today at a glance</h3><div class="kpis" id="hKpis"></div></div>
+    <div class="card"><h3><span>Today's schedule</span></h3><div id="hSched"></div></div>
+    <div class="card"><h3><span>Open tasks</span><span id="hTaskN"></span></h3><div id="hTasks"></div></div>
+    <div class="card full"><h3>Next deadline</h3><div id="hDead"></div></div>
+  </section>
+
+  <section id="focus" class="view two">
+    <div class="card timer">
+      <div class="zclock" id="zClock"></div>
+      <div class="chips">
+        <button class="chip on" data-mode="focus">Focus</button>
+        <button class="chip" data-mode="short">Short break</button>
+        <button class="chip" data-mode="long">Long break</button>
+      </div>
+      <div class="ring" id="ring">
+        <svg viewBox="0 0 260 260">
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" style="stop-color:var(--accent)"/>
+              <stop offset="1" style="stop-color:var(--accent2)"/>
+            </linearGradient>
+          </defs>
+          <circle class="bg2" cx="130" cy="130" r="120" fill="none" stroke-width="12"/>
+          <circle id="fg" class="fg" cx="130" cy="130" r="120" fill="none" stroke-width="12" stroke="url(#g)" stroke-dasharray="753.98" stroke-dashoffset="0"/>
+        </svg>
+        <div class="time"><b id="time">25:00</b><span class="label" id="modeLbl">Focus</span></div>
+      </div>
+      <div class="label" id="activeLbl"></div>
+      <div class="ctrl">
+        <button id="resetBtn">Reset</button>
+        <button class="pri" id="playBtn">Start</button>
+        <button id="skipBtn">Skip</button>
+      </div>
+      <div class="stack">
+        <div class="grid2">
+          <label class="field">Ambient sound
+            <select data-s="noise"><option value="off">Off</option><option value="white">White noise</option><option value="brown">Brown noise</option><option value="ocean">Ocean waves</option><option value="rain">Rain</option><option value="alpha">Alpha waves (10 Hz)</option><option value="gamma">Gamma waves (40 Hz)</option></select></label>
+          <label class="field">Ambient volume<input type="range" data-s="vol" min="0" max="100"></label>
+        </div>
+        <input type="text" id="note" placeholder="What did you finish this session? (saved to your stats)">
+      </div>
+      <div class="muted">Shortcuts: Space start or pause, R reset, N skip, F focus mode, Ctrl K commands</div>
+    </div>
+
+    <div class="card">
+      <h3><span>Tasks</span><span id="taskCount"></span></h3>
+      <div class="add">
+        <input type="text" id="newTask" placeholder="New task">
+        <select id="newPri"><option value="1">High</option><option value="2" selected>Medium</option><option value="3">Low</option></select>
+        <input type="text" id="newTag" placeholder="Tag">
+        <button class="pri" id="addBtn">Add</button>
+      </div>
+      <div class="chips" style="justify-content:flex-start;margin-bottom:12px" id="filters">
+        <button class="chip on" data-f="all">All</button>
+        <button class="chip" data-f="open">Open</button>
+        <button class="chip" data-f="done">Done</button>
+      </div>
+      <div id="tasks"></div>
+      <p class="muted">Click a task title to rename it. The Focus button makes it the active task for your sessions.</p>
+    </div>
+
+    <div class="card" style="grid-column:1/-1">
+      <h3><span>This week (focused minutes)</span><span id="weekTxt"></span></h3>
+      <div id="week"></div>
+    </div>
+  </section>
+
+  <section id="planner" class="view">
+    <details class="card" id="setupDet" open>
+      <summary>Syllabus setup</summary>
+      <div class="stack" style="margin-top:16px">
+        <div class="grid2">
+          <label class="field">Exam date<input type="date" id="exam"></label>
+          <label class="field">Minutes per topic<input type="number" id="perTopic" value="45" min="10" max="240"></label>
+        </div>
+        <label class="field">Study hours per day: <b id="hVal" style="color:var(--text)">2</b>
+          <input type="range" id="hours" min="0.5" max="8" step="0.5" value="2"></label>
+        <label class="field">Syllabus (one subject per line, format "Subject: topic, topic")
+          <textarea id="syll" rows="6" placeholder="Economics: Demand and supply, Elasticity"></textarea></label>
+        <label class="row" style="font-size:14px"><input type="checkbox" id="rev" checked> Add a 60-minute revision slot every Sunday</label>
+        <div class="row">
+          <button class="pri" id="genBtn">Generate plan</button>
+          <button id="sampleBtn">Load sample</button>
+        </div>
+      </div>
+    </details>
+
+    <div class="card" id="board" style="display:none">
+      <div class="row" style="justify-content:space-between;margin-bottom:6px">
+        <h3 style="margin:0">Your plan</h3>
+        <div class="row">
+          <button id="carry">Move overdue to today</button>
+          <button class="danger" id="clearPlan">Clear plan</button>
+        </div>
+      </div>
+      <div class="kpis" id="pStats"></div>
+      <div class="prog"><i id="bar"></i></div>
+      <div class="days" id="days"></div>
+      <div class="row" style="justify-content:space-between;margin:16px 0 10px">
+        <b id="dayTitle"></b>
+        <button id="markDay">Mark day complete</button>
+      </div>
+      <div id="items"></div>
+    </div>
+  </section>
+
+  <section id="stats" class="view two">
+    <div class="card">
+      <h3>Overview</h3>
+      <div class="kpis" id="kpis"></div>
+      <h3 style="margin-top:22px">Focus by subject</h3>
+      <div id="subjects"></div>
+    </div>
+    <div class="card">
+      <h3>Last 12 weeks</h3>
+      <div class="heat" id="heat"></div>
+      <div class="muted" style="margin-top:10px">Brighter squares mean more focused minutes that day.</div>
+      <h3 style="margin-top:22px">Recent session notes</h3>
+      <div id="notes"></div>
+    </div>
+  </section>
+
+  <section id="settings" class="view two">
+    <div class="card" style="grid-column:1/-1">
+      <h3>Theme</h3><div class="themes" id="themes"></div>
+      <div class="sw-row" style="margin-top:16px"><span class="muted">Palettes</span><span class="sw-row" id="pals"></span></div>
+      <div class="grid2" style="margin-top:14px">
+        <label class="field">Accent color<input type="color" data-s="accent"></label>
+        <label class="field">Second color<input type="color" data-s="accent2"></label>
+      </div>
+      <div class="row" style="margin-top:12px"><button id="resetColors">Reset colors</button></div>
+    </div>
+    <div class="card">
+      <h3>Look and feel</h3>
+      <div class="grid2">
+        <label class="field">Font<select data-s="font"><optgroup label="Sans-serif"><option value="sans">System</option><option value="inter">Inter</option><option value="jakarta">Plus Jakarta Sans</option><option value="manrope">Manrope</option><option value="dmsans">DM Sans</option><option value="poppins">Poppins</option><option value="outfit">Outfit</option><option value="grotesk">Space Grotesk</option></optgroup><optgroup label="Rounded"><option value="rounded">System rounded</option><option value="nunito">Nunito</option><option value="quicksand">Quicksand</option></optgroup><optgroup label="Serif"><option value="serif">Georgia</option><option value="playfair">Playfair Display</option><option value="lora">Lora</option></optgroup><optgroup label="Mono and fun"><option value="mono">System mono</option><option value="jetbrains">JetBrains Mono</option><option value="fira">Fira Code</option><option value="hand">Caveat (handwritten)</option></optgroup></select></label>
+        <label class="field">Background<select data-s="bgStyle"><option value="aurora">Aurora (animated)</option><option value="mesh">Soft mesh</option><option value="grid">Grid</option><option value="plain">Plain</option></select></label>
+        <label class="field">Background motion<select data-s="bgMotion"><option value="lively">Lively</option><option value="gentle">Gentle</option></select></label>
+        <label class="field">Corner radius<input type="range" data-s="radius" min="0" max="32"></label>
+        <label class="field">Glass blur<input type="range" data-s="blur" min="0" max="40"></label>
+        <label class="field">Card tint<input type="range" data-s="surf" min="0" max="100"></label>
+        <label class="field">Timer ring thickness<input type="range" data-s="ringW" min="4" max="22"></label>
+        <label class="field">Density<select data-s="density"><option value="cozy">Comfortable</option><option value="compact">Compact</option></select></label>
+        <label class="field">Sidebar<select data-s="sidebar"><option value="full">Full</option><option value="mini">Icons only</option></select></label>
+      </div>
+      <div class="row" style="margin-top:14px;font-size:14px"><label class="row"><input type="checkbox" data-s="anim"> Animated background and motion</label></div>
+    </div>
+    <div class="card">
+      <h3>Timer and goals</h3>
+      <div class="grid2">
+        <label class="field">Focus (minutes)<input type="number" data-s="focus" min="1" max="180"></label>
+        <label class="field">Short break<input type="number" data-s="short" min="1" max="180"></label>
+        <label class="field">Long break<input type="number" data-s="long" min="1" max="180"></label>
+        <label class="field">Long break every<input type="number" data-s="every" min="1" max="12"></label>
+        <label class="field" style="grid-column:1/-1">Daily goal (minutes)<input type="number" data-s="goal" min="15" max="960" step="15"></label>
+      </div>
+      <div class="row" style="margin-top:14px;font-size:14px;gap:16px">
+        <label class="row"><input type="checkbox" data-s="sound"> Chime on finish</label>
+        <label class="row"><input type="checkbox" data-s="auto"> Auto-start next</label>
+        <label class="row"><input type="checkbox" data-s="notify"> Desktop notifications</label>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Sound and calendar</h3>
+      <div class="grid2">
+        <label class="field">Alpha and gamma tones<select data-s="beatMode"><option value="binaural">Binaural (headphones)</option><option value="isochronic">Pulsed tone (speakers)</option></select></label>
+        <label class="field">Ambient volume (focus timer)<input type="range" data-s="vol" min="0" max="100"></label>
+        <label class="field">Week starts on<select data-s="weekStart"><option value="0">Sunday</option><option value="1">Monday</option></select></label>
+        <label class="field">Calendar opens in<select data-s="calView"><option value="month">Month</option><option value="week">Week</option><option value="day">Day</option></select></label>
+      </div>
+      <div class="row" style="margin-top:14px;font-size:14px"><label class="row"><input type="checkbox" data-s="h24"> 24-hour clock</label></div>
+    </div>
+    <div class="card">
+      <h3>Profile</h3>
+      <label class="field">Your name (used in the Home greeting)<input type="text" data-s="name" maxlength="30" placeholder="Optional"></label>
+    </div>
+    <div class="card" style="grid-column:1/-1">
+      <h3>Data</h3>
+      <div class="row">
+        <button id="exportBtn">Export backup</button>
+        <label><button type="button" onclick="document.getElementById('importFile').click()">Import backup</button></label>
+        <input type="file" id="importFile" accept="application/json" style="display:none">
+        <button class="danger" id="eraseBtn">Erase all data</button>
+      </div>
+      <p class="muted" style="margin-bottom:0">Data is stored in this browser. Export a backup to keep a copy or move to another device.</p>
+    </div>
+  </section>
+  <section id="calendar" class="view">
+    <div class="card">
+      <div class="cal-bar">
+        <button class="pri" id="cNew">+ Create</button><button id="cToday">Today</button>
+        <button id="cPrev" aria-label="Previous">‹</button><button id="cNext" aria-label="Next">›</button>
+        <h2 id="cTitle"></h2>
+        <div class="seg" id="cSeg"><button data-cv="month" class="on">Month</button><button data-cv="week">Week</button><button data-cv="day">Day</button></div>
+        <label class="row muted" style="margin-left:auto"><input type="checkbox" id="cHol" checked> Holidays</label>
+      </div>
+      <div class="cal-layout" style="display:grid;gap:18px">
+        <div id="cBody" style="min-width:0"></div>
+        <div><h3><span>Upcoming</span><span id="cNow"></span></h3><div id="cUp"></div>
+          <p class="muted">Green: public holidays. Amber: festivals and observances. Dates for 2026 and 2027 follow the official DoPT lists. Later years are astronomical estimates and moon-sighting holidays can shift by a day.</p></div>
+      </div>
+    </div>
+  </section>
+  <section id="relax" class="view">
+    <div class="card" id="galCard" style="grid-column:1/-1">
+      <h3><span>Particle galaxy</span><span class="row"><select id="gMode" style="width:auto"><option value="rotate">Drag: rotate</option><option value="stir">Drag: stir</option></select><label class="row muted"><input type="checkbox" id="gAuto" checked> Auto-orbit</label><select id="gCount" style="width:auto"></select><button id="gReset">Reset</button><button data-fs="galCard">Expand</button></span></h3>
+      <canvas id="galaxy"></canvas>
+      <div class="muted" style="margin-top:10px">Hover to pull the stars into swirls. Drag to rotate in 3D, scroll or pinch to zoom, click or tap for a supernova.</div>
+    </div>
+    <div class="card" id="fluCard" style="grid-column:1/-1">
+      <h3><span>Fluid simulation</span><span class="row"><label class="row muted"><input type="checkbox" id="fAuto" checked> Auto ink</label><button id="fClear">Clear</button><button data-fs="fluCard">Expand</button></span></h3>
+      <canvas id="fluid"></canvas>
+      <div class="muted" style="margin-top:10px">Stir with your cursor or finger. Slow strokes make cool blues, fast strokes shift to warm colours. Click or tap for an ink bloom.</div>
+    </div>
+    <div class="card">
+      <h3><span>Soundscapes</span><span class="row"><select id="sleep" style="width:auto" title="Sleep timer"><option value="0">No sleep timer</option><option value="15">Stop in 15 min</option><option value="30">Stop in 30 min</option><option value="60">Stop in 60 min</option></select><button id="sStop">Stop all</button></span></h3>
+      <div class="mix" id="mix"></div>
+      <p class="muted" style="margin-bottom:0">Mix any sounds together. Alpha (10 Hz) and gamma (40 Hz) are brainwave entrainment tones, best with headphones. Research on their focus benefits is mixed, so treat them as an optional aid. Switch to pulsed tones in Settings if you use speakers.</p>
+    </div>
+    <div class="card">
+      <h3><span>Guided breathing</span><select id="bPat" style="width:auto"><option value="4,4,4,4">Box 4-4-4-4</option><option value="4,7,8,0">Relax 4-7-8</option><option value="5,0,5,0">Calm 5-5</option></select></h3>
+      <div class="breath"><div id="bCircle"></div><span id="bTxt">Ready</span></div>
+      <div class="row" style="justify-content:center"><button class="pri" id="bBtn">Start</button></div>
+    </div>
+  </section>
+</main></div></div>
+
+<div id="modal"><div class="card"><h3><span id="mTitle">New event</span><button id="mX">✕</button></h3><div class="stack">
+<input type="text" id="eT" placeholder="Add title">
+<div class="chips" id="eKind" style="justify-content:flex-start"><button class="chip on" data-k="Event">Event</button><button class="chip" data-k="Task">Task</button><button class="chip" data-k="Deadline">Deadline</button></div>
+<div class="grid2"><label class="field">Start date<input type="date" id="eD"></label><label class="field">End date<input type="date" id="eD2"></label></div>
+<label class="row"><input type="checkbox" id="eAll" checked> All day</label>
+<div class="grid2" id="eTimes" style="display:none"><label class="field">Start time<input type="time" id="eS" value="09:00"></label><label class="field">End time<input type="time" id="eE" value="10:00"></label></div>
+<div class="grid2"><label class="field">Repeat<select id="eR"><option value="">Does not repeat</option><option value="d">Daily</option><option value="w">Weekly</option><option value="m">Monthly</option><option value="y">Yearly</option></select></label><label class="field">Colour<input type="color" id="eC" value="#7c5cff"></label></div>
+<input type="text" id="eL" placeholder="Location"><textarea id="eN" rows="3" placeholder="Notes"></textarea>
+<label class="row" id="eDoneW"><input type="checkbox" id="eDone"> Mark as done</label>
+<div class="row" style="justify-content:space-between"><button class="danger" id="eDel">Delete</button><button class="pri" id="eSave">Save</button></div></div></div></div>
+<div id="pal"><div class="pbox"><input id="palQ" type="text" placeholder="Type a command or tab name"><div id="palList"></div></div></div>
+<button class="zx" id="zenX">Exit focus mode</button>
+<div id="toast"></div>
+<canvas id="fx"></canvas>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const KEY='focusHub.v2';
+const fmt=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return fmt(d)};
+const TODAY=()=>fmt(new Date());
+const uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const wd=s=>parse(s).toLocaleDateString('en-US',{weekday:'short'});
+const longD=s=>parse(s).toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long'});
+const subjColor=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return `hsl(${h} 70% 62%)`};
+const PRI={1:'#f87171',2:'#fbbf24',3:'#60a5fa'};
+
+const PRESETS={
+  aurora:{bg:'#0b1020',text:'#eef0ff',muted:'#9aa3c7',accent:'#7c5cff',accent2:'#22d3ee',glass:'rgba(255,255,255,.06)',line:'rgba(255,255,255,.09)'},
+  midnight:{bg:'#05060a',text:'#e6e8ef',muted:'#7d8496',accent:'#3b82f6',accent2:'#a855f7',glass:'rgba(255,255,255,.04)',line:'rgba(255,255,255,.07)'},
+  sunset:{bg:'#1a0f1f',text:'#fff1ea',muted:'#c4a7b5',accent:'#f97316',accent2:'#ec4899',glass:'rgba(255,255,255,.06)',line:'rgba(255,255,255,.09)'},
+  forest:{bg:'#071410',text:'#e8f5ee',muted:'#8fb5a0',accent:'#22c55e',accent2:'#eab308',glass:'rgba(255,255,255,.05)',line:'rgba(255,255,255,.08)'},
+  paper:{light:1,bg:'#f5f2ec',text:'#1d1b16',muted:'#6b6558',accent:'#b45309',accent2:'#0f766e',glass:'rgba(255,255,255,.6)',line:'rgba(0,0,0,.08)'},
+  cloud:{light:1,bg:'#eef2f7',text:'#0f172a',muted:'#64748b',accent:'#4f46e5',accent2:'#06b6d4',glass:'rgba(255,255,255,.6)',line:'rgba(15,23,42,.09)'},
+  ocean:{bg:'#06141c',text:'#e6f6fb',muted:'#82a9b8',accent:'#06b6d4',accent2:'#3b82f6',glass:'rgba(255,255,255,.05)',line:'rgba(255,255,255,.08)'},
+  rose:{bg:'#1a0b12',text:'#ffeef2',muted:'#c9a0ab',accent:'#fb7185',accent2:'#f59e0b',glass:'rgba(255,255,255,.06)',line:'rgba(255,255,255,.09)'},
+  nebula:{bg:'#0d0716',text:'#f3ecff',muted:'#b19ccf',accent:'#c084fc',accent2:'#f472b6',glass:'rgba(255,255,255,.06)',line:'rgba(255,255,255,.09)'},
+  mono:{bg:'#0a0a0a',text:'#ededed',muted:'#8a8a8a',accent:'#e5e5e5',accent2:'#737373',glass:'rgba(255,255,255,.05)',line:'rgba(255,255,255,.09)'}
+};
+const FONTS={"sans": "system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif", "inter": "\"Inter\",system-ui,sans-serif", "jakarta": "\"Plus Jakarta Sans\",system-ui,sans-serif", "manrope": "\"Manrope\",system-ui,sans-serif", "dmsans": "\"DM Sans\",system-ui,sans-serif", "poppins": "\"Poppins\",system-ui,sans-serif", "outfit": "\"Outfit\",system-ui,sans-serif", "grotesk": "\"Space Grotesk\",system-ui,sans-serif", "rounded": "ui-rounded,\"SF Pro Rounded\",\"Nunito\",\"Segoe UI\",system-ui,sans-serif", "nunito": "\"Nunito\",system-ui,sans-serif", "quicksand": "\"Quicksand\",system-ui,sans-serif", "serif": "Georgia,\"Times New Roman\",serif", "playfair": "\"Playfair Display\",Georgia,serif", "lora": "\"Lora\",Georgia,serif", "mono": "ui-monospace,Menlo,Consolas,monospace", "jetbrains": "\"JetBrains Mono\",ui-monospace,monospace", "fira": "\"Fira Code\",ui-monospace,monospace", "hand": "\"Caveat\",\"Segoe Print\",cursive"};
+
+const DEF={settings:{theme:'aurora',accent:null,accent2:null,font:'inter',radius:20,anim:true,bgMotion:'lively',focus:25,short:5,long:15,every:4,goal:120,noise:'off',vol:30,sound:true,auto:false,name:'',blur:20,surf:30,ringW:12,bgStyle:'aurora',density:'cozy',sidebar:'full',beatMode:'binaural',notify:false,weekStart:'0',calView:'month',h24:false},tasks:[],events:[],calHol:true,log:{},notes:[],active:null,plan:null,filter:'all'};
+let S;
+try{
+  const saved=JSON.parse(localStorage.getItem(KEY))||{};
+  S=Object.assign(structuredClone(DEF),saved);
+  S.settings=Object.assign(structuredClone(DEF.settings),saved.settings||{});
+  S.tasks=(S.tasks||[]).map(t=>Object.assign({pri:2,tag:'',pomo:0,done:false},t));
+  S.notes=S.notes||[];S.events=S.events||[];
+}catch(e){S=structuredClone(DEF)}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function day(d){return S.log[d]||(S.log[d]={min:0,n:0,tasks:0,subj:{}})}
+function activeDay(d){const l=S.log[d];return !!l&&(l.n>0||l.tasks>0)}
+function streak(){let d=TODAY();if(!activeDay(d))d=addDays(d,-1);let c=0;while(activeDay(d)){c++;d=addDays(d,-1)}return c}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2800)}
+
+/* ---------- Ambient sound ---------- */
+let actx=null,noiseSrc=null,noiseGain=null;
+function stopAmbient(){try{noiseSrc&&noiseSrc.stop()}catch(e){}noiseSrc=null;noiseGain=null}
+function playAmbient(type){
+  stopAmbient();
+  if(type==='off')return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    if(SND[type]){actx.resume&&actx.resume();const h=SND[type](actx,S.settings.vol/100);noiseGain=h.gain;noiseSrc=h;return}
+    const len=actx.sampleRate*3,buf=actx.createBuffer(1,len,actx.sampleRate),d=buf.getChannelData(0);
+    let last=0;
+    for(let i=0;i<len;i++){const w=Math.random()*2-1;if(type==='brown'){last=(last+.02*w)/1.02;d[i]=last*3.5}else d[i]=w*.4}
+    noiseSrc=actx.createBufferSource();noiseSrc.buffer=buf;noiseSrc.loop=true;
+    noiseGain=actx.createGain();noiseGain.gain.value=S.settings.vol/100;
+    noiseSrc.connect(noiseGain).connect(actx.destination);noiseSrc.start();
+  }catch(e){}
+}
+function applyNoise(){
+  if(running&&mode==='focus')playAmbient(S.settings.noise);else stopAmbient();
+  if(noiseGain)noiseGain.gain.value=S.settings.vol/100;
+}
+
+/* ---------- Timer ---------- */
+let mode='focus',rem=0,total=0,endAt=0,running=false,timerId=null,cycles=0;
+const LEN=m=>S.settings[m]*60000;
+function stop(){running=false;clearInterval(timerId);timerId=null;stopAmbient()}
+function reset(m=mode){stop();mode=m;total=rem=LEN(m);paint()}
+function start(){if(running||rem<=0)return;running=true;endAt=Date.now()+rem;timerId=setInterval(tickT,200);applyNoise();paint()}
+function pause(){if(!running)return;rem=Math.max(0,endAt-Date.now());stop();paint()}
+function toggle(){running?pause():start()}
+function tickT(){rem=endAt-Date.now();if(rem<=0){finish();return}paint()}
+function skip(){stop();if(mode==='focus')reset((cycles+1)%S.settings.every===0?'long':'short');else reset('focus')}
+function finish(){
+  stop();rem=0;
+  if(mode==='focus'){
+    cycles++;
+    const at=S.tasks.find(x=>x.id===S.active);
+    const t=day(TODAY());t.min+=S.settings.focus;t.n++;
+    const subj=at&&at.tag?at.tag:'General';
+    t.subj[subj]=(t.subj[subj]||0)+S.settings.focus;
+    if(at)at.pomo=(at.pomo||0)+1;
+    const note=$('#note').value.trim();
+    if(note){S.notes.unshift({d:TODAY(),t:at?at.text:'Focus',n:note});S.notes=S.notes.slice(0,40);$('#note').value=''}
+    save();celebrate();beep();
+    $('#ring').animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:600});
+    toast('Session complete. Nice work.');ping('Session complete. Time for a break.');
+    reset(cycles%S.settings.every===0?'long':'short');
+    renderTasks();renderWeek();
+  }else{
+    toast('Break finished. Time to focus.');ping('Break finished. Time to focus.');
+    reset('focus');
+  }
+  if(S.settings.auto)start();
+}
+function paint(){
+  const s=Math.ceil(rem/1000),m=Math.floor(s/60),ss=s%60;
+  const t=String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0');
+  $('#time').textContent=t;
+  document.title=(running?t+' · ':'')+'Focus Hub';
+  const C=2*Math.PI*120;
+  $('#fg').style.strokeDashoffset=C*(1-(total?rem/total:0));
+  $('#fg').style.stroke=mode==='focus'?'url(#g)':'#34d399';
+  $('#modeLbl').textContent={focus:'Focus',short:'Short break',long:'Long break'}[mode];
+  $('#playBtn').textContent=running?'Pause':(rem<total&&rem>0?'Resume':'Start');
+  $('#ring').classList.toggle('pulse',running);
+  const at=S.tasks.find(x=>x.id===S.active);
+  $('#activeLbl').textContent=at?'Working on: '+at.text+(at.tag?' ('+at.tag+')':''):'Select a task to track its sessions';
+  $$('[data-mode]').forEach(b=>b.classList.toggle('on',b.dataset.mode===mode));
+  renderHeader();
+}
+$$('[data-mode]').forEach(b=>b.onclick=()=>reset(b.dataset.mode));
+$('#playBtn').onclick=toggle;
+$('#resetBtn').onclick=()=>reset();
+$('#skipBtn').onclick=skip;
+function renderHeader(){
+  const m=day(TODAY()).min,g=S.settings.goal||1;
+  $('#goalTxt').textContent=`Today ${m}/${g} min`;
+  $('#gbar').style.width=Math.min(100,m/g*100)+'%';
+}
+function beep(){
+  if(!S.settings.sound)return;
+  try{
+    const A=actx||new (window.AudioContext||window.webkitAudioContext)();actx=A;
+    [0,.22,.44].forEach((t,i)=>{
+      const o=A.createOscillator(),g=A.createGain();
+      o.frequency.value=[523,659,784][i];o.connect(g);g.connect(A.destination);
+      g.gain.setValueAtTime(.0001,A.currentTime+t);
+      g.gain.exponentialRampToValueAtTime(.18,A.currentTime+t+.02);
+      g.gain.exponentialRampToValueAtTime(.0001,A.currentTime+t+.3);
+      o.start(A.currentTime+t);o.stop(A.currentTime+t+.32);
+    });
+  }catch(e){}
+}
+function celebrate(){
+  const c=$('#fx'),x=c.getContext('2d');
+  c.width=innerWidth;c.height=innerHeight;
+  const cols=[getComputedStyle(document.documentElement).getPropertyValue('--accent'),getComputedStyle(document.documentElement).getPropertyValue('--accent2'),'#fbbf24','#f472b6'];
+  const ps=[...Array(180)].map(()=>({x:innerWidth/2,y:innerHeight/3,vx:(Math.random()-.5)*16,vy:Math.random()*-14-4,r:Math.random()*6+3,c:cols[Math.floor(Math.random()*cols.length)],a:1}));
+  let f=0;
+  (function step(){
+    x.clearRect(0,0,c.width,c.height);
+    ps.forEach(p=>{p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.a-=.008;x.globalAlpha=Math.max(p.a,0);x.fillStyle=p.c;x.fillRect(p.x,p.y,p.r,p.r*1.6)});
+    if(++f<200)requestAnimationFrame(step);else x.clearRect(0,0,c.width,c.height);
+  })();
+}
+
+/* ---------- Tasks ---------- */
+let FILTER='all';
+function renderTasks(){
+  const list=S.tasks
+    .filter(t=>FILTER==='all'||(FILTER==='open'&&!t.done)||(FILTER==='done'&&t.done))
+    .sort((a,b)=>a.done-b.done||a.pri-b.pri);
+  $('#tasks').innerHTML=list.length?list.map(t=>`
+    <div class="task ${t.done?'done':''} ${S.active===t.id?'active':''}">
+      <input type="checkbox" data-act="done" data-id="${t.id}" ${t.done?'checked':''}>
+      <span class="dot" style="background:${PRI[t.pri]}"></span>
+      <span class="tt" data-act="rename" data-id="${t.id}">${esc(t.text)}</span>
+      ${t.tag?`<span class="pill" style="color:${subjColor(t.tag)}">${esc(t.tag)}</span>`:''}
+      <span class="pill">${t.pomo||0} pomos</span>
+      <button data-act="pick" data-id="${t.id}">${S.active===t.id?'Active':'Focus'}</button>
+      <button class="danger" data-act="del" data-id="${t.id}">✕</button>
+    </div>`).join(''):'<p class="muted">Nothing here yet. Add a task above.</p>';
+  $('#taskCount').textContent=`${S.tasks.filter(t=>t.done).length}/${S.tasks.length} done`;
+  $$('#filters .chip').forEach(c=>c.classList.toggle('on',c.dataset.f===FILTER));
+  save();paint();
+}
+function addTask(){
+  const text=$('#newTask').value.trim();if(!text)return;
+  S.tasks.push({id:uid(),text,done:false,pri:+$('#newPri').value,tag:$('#newTag').value.trim(),pomo:0});
+  $('#newTask').value='';renderTasks();
+}
+$('#addBtn').onclick=addTask;
+$('#newTask').onkeydown=e=>{if(e.key==='Enter')addTask()};
+$$('#filters .chip').forEach(c=>c.onclick=()=>{FILTER=c.dataset.f;renderTasks()});
+$('#tasks').onclick=e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const id=b.dataset.id,t=S.tasks.find(x=>x.id===id);if(!t)return;
+  const a=b.dataset.act;
+  if(a==='done')t.done=!t.done;
+  if(a==='pick')S.active=S.active===id?null:id;
+  if(a==='del'){S.tasks=S.tasks.filter(x=>x.id!==id);if(S.active===id)S.active=null}
+  if(a==='rename'){const n=prompt('Rename task',t.text);if(n&&n.trim())t.text=n.trim()}
+  renderTasks();
+};
+
+/* ---------- Week chart ---------- */
+function renderWeek(){
+  const days=[-6,-5,-4,-3,-2,-1,0].map(n=>addDays(TODAY(),n));
+  const mins=days.map(d=>S.log[d]?.min||0),max=Math.max(S.settings.goal,...mins),tot=mins.reduce((a,b)=>a+b,0);
+  $('#weekTxt').textContent=(tot/60).toFixed(1)+' h';
+  $('#week').innerHTML=`<div class="bars">${days.map((d,i)=>`<div class="bar"><small>${mins[i]}m</small><div class="track"><i style="height:${Math.max(mins[i]?8:3,mins[i]/max*160)}px"></i></div><small>${wd(d)}</small></div>`).join('')}</div>`;
+}
+
+/* ---------- Planner ---------- */
+let SEL=null;
+function syncAll(){if(S.plan)S.plan.days.forEach(d=>{day(d.date).tasks=d.items.filter(i=>i.done).length})}
+function generate(){
+  const start=TODAY(),exam=$('#exam').value;
+  if(!exam||exam<=start){toast('Choose an exam date after today');return}
+  const hours=+$('#hours').value,per=Math.max(10,+$('#perTopic').value||45),cap=hours*60;
+  const queues=$('#syll').value.split('\n').map(l=>{
+    const i=l.indexOf(':');
+    return {sub:i>-1?l.slice(0,i).trim():'General',topics:(i>-1?l.slice(i+1):l).split(',').map(s=>s.trim()).filter(Boolean)};
+  }).filter(q=>q.topics.length);
+  if(!queues.length){toast('Add at least one subject with topics');return}
+  const topics=[],max=Math.max(...queues.map(q=>q.topics.length));
+  for(let i=0;i<max;i++)queues.forEach(q=>{if(q.topics[i])topics.push({sub:q.sub,text:q.topics[i]})});
+  const n=Math.round((parse(exam)-parse(start))/864e5);
+  const days=[...Array(n)].map((_,k)=>({date:addDays(start,k),items:[]}));
+  let di=0,used=0;
+  topics.forEach(t=>{
+    if(used+per>cap&&used>0&&di<days.length-1){di++;used=0}
+    days[di].items.push({id:uid(),sub:t.sub,text:t.text,mins:per,done:false});used+=per;
+  });
+  if($('#rev').checked)days.forEach(d=>{if(parse(d.date).getDay()===0)d.items.push({id:uid(),sub:'Revision',text:'Weekly revision',mins:60,done:false})});
+  S.plan={exam,hours,per,days:days.filter(d=>d.items.length)};
+  SEL=null;syncAll();save();renderPlanner();
+  toast(used>cap?'Plan created. Some days exceed your daily hours.':`Plan created: ${topics.length} topics across ${S.plan.days.length} days`);
+}
+function renderPlanner(){
+  const p=S.plan;
+  $('#setupDet').open=!p;
+  $('#board').style.display=p?'block':'none';
+  if(!p)return;
+  const all=p.days.flatMap(d=>d.items),done=all.filter(i=>i.done).length;
+  const pct=all.length?Math.round(done/all.length*100):0;
+  const overdue=p.days.filter(d=>d.date<TODAY()).flatMap(d=>d.items.filter(i=>!i.done)).length;
+  const left=Math.max(0,Math.round((parse(p.exam)-parse(TODAY()))/864e5));
+  const rMins=all.filter(i=>!i.done).reduce((s,i)=>s+i.mins,0);
+  $('#pStats').innerHTML=[['Progress',pct+'%'],['Days left',left],['Overdue',overdue],['Study left',(rMins/60).toFixed(1)+' h']]
+    .map(([k,v])=>`<div class="kpi"><small>${k}</small><b>${v}</b></div>`).join('');
+  $('#bar').style.width=pct+'%';
+  if(!p.days.find(d=>d.date===SEL))SEL=(p.days.find(d=>d.date>=TODAY())||p.days[p.days.length-1]||{}).date||null;
+  $('#days').innerHTML=p.days.map(d=>{
+    const f=d.items.length?Math.round(d.items.filter(i=>i.done).length/d.items.length*100):0;
+    return `<button class="dayc ${d.date===SEL?'on':''} ${d.date===TODAY()?'today':''}" data-day="${d.date}"><small>${wd(d.date)}</small><b>${parse(d.date).getDate()}</b><i style="width:${f}%"></i></button>`;
+  }).join('');
+  const d=p.days.find(x=>x.date===SEL);
+  $('#dayTitle').textContent=d?`${longD(d.date)} · ${d.items.reduce((s,i)=>s+i.mins,0)} min planned`:'No study days';
+  $('#items').innerHTML=d?d.items.map(i=>`
+    <div class="task ${i.done?'done':''}">
+      <input type="checkbox" data-pact="toggle" data-id="${i.id}" ${i.done?'checked':''}>
+      <span class="tt"><span class="pill" style="color:${subjColor(i.sub)}">${esc(i.sub)}</span><br>${esc(i.text)}</span>
+      <span class="pill">${i.mins}m</span>
+      <button data-pact="focus" data-id="${i.id}">Focus</button>
+    </div>`).join(''):'';
+}
+$('#genBtn').onclick=generate;
+$('#sampleBtn').onclick=()=>{
+  $('#syll').value='Economics: Demand and supply, Elasticity, Market structures, National income\nQuantitative Aptitude: Percentages, Ratios, Profit and loss, Time and work\nAccounts: Journal entries, Ledgers, Trial balance';
+  $('#exam').value=addDays(TODAY(),45);$('#hours').value=2;$('#hVal').textContent='2';
+};
+$('#hours').oninput=()=>$('#hVal').textContent=$('#hours').value;
+$('#days').onclick=e=>{const b=e.target.closest('[data-day]');if(b){SEL=b.dataset.day;renderPlanner()}};
+$('#items').onclick=e=>{
+  const b=e.target.closest('[data-pact]');if(!b||!S.plan)return;
+  const dd=S.plan.days.find(d=>d.date===SEL);if(!dd)return;
+  const it=dd.items.find(i=>i.id===b.dataset.id);if(!it)return;
+  if(b.dataset.pact==='focus'){
+    const id=uid();
+    S.tasks.push({id,text:it.text,done:false,pri:2,tag:it.sub,pomo:0});
+    S.active=id;renderTasks();show('focus');toast('Topic sent to the timer');return;
+  }
+  it.done=!it.done;syncAll();save();renderPlanner();
+};
+$('#markDay').onclick=()=>{
+  const d=S.plan?.days.find(x=>x.date===SEL);if(!d)return;
+  d.items.forEach(i=>i.done=true);syncAll();save();renderPlanner();toast('Day marked complete');
+};
+$('#carry').onclick=()=>{
+  if(!S.plan)return;
+  const t=TODAY(),moved=[];
+  S.plan.days.forEach(d=>{if(d.date<t){const keep=[];d.items.forEach(i=>{if(i.done)keep.push(i);else moved.push(i)});d.items=keep}});
+  if(!moved.length){toast('No overdue topics');return}
+  let td=S.plan.days.find(d=>d.date===t);
+  if(!td){td={date:t,items:[]};S.plan.days.push(td)}
+  td.items.push(...moved);
+  S.plan.days=S.plan.days.filter(d=>d.items.length).sort((a,b)=>a.date.localeCompare(b.date));
+  SEL=t;syncAll();save();renderPlanner();toast(`Moved ${moved.length} topics to today`);
+};
+$('#clearPlan').onclick=()=>{
+  if(!confirm('Delete the current plan?'))return;
+  S.plan=null;SEL=null;Object.values(S.log).forEach(l=>l.tasks=0);save();renderPlanner();
+};
+
+/* ---------- Stats ---------- */
+function renderStats(){
+  const L=Object.values(S.log);
+  const mins=L.reduce((a,l)=>a+l.min,0),sess=L.reduce((a,l)=>a+l.n,0);
+  const activeDays=Object.keys(S.log).filter(activeDay).length;
+  const itemsDone=S.plan?S.plan.days.flatMap(d=>d.items).filter(i=>i.done).length:0;
+  $('#kpis').innerHTML=[['Current streak',streak()+' days'],['Focus time',(mins/60).toFixed(1)+' h'],['Sessions',sess],['Active days',activeDays],['Topics done',itemsDone],['Today',day(TODAY()).min+' min']]
+    .map(([k,v])=>`<div class="kpi"><small>${k}</small><b>${v}</b></div>`).join('');
+  const bySub={};
+  L.forEach(l=>Object.entries(l.subj||{}).forEach(([k,v])=>bySub[k]=(bySub[k]||0)+v));
+  const entries=Object.entries(bySub).sort((a,b)=>b[1]-a[1]),top=entries[0]?.[1]||1;
+  $('#subjects').innerHTML=entries.length?entries.map(([k,v])=>`<div class="sub"><div class="r"><span>${esc(k)}</span><span>${(v/60).toFixed(1)} h</span></div><div class="b"><i style="width:${v/top*100}%;background:${subjColor(k)}"></i></div></div>`).join(''):'<p class="muted">Subject breakdown appears after your first session. Tag tasks to group them.</p>';
+  $('#heat').innerHTML=[...Array(84)].map((_,i)=>{
+    const d=addDays(TODAY(),i-83),m=S.log[d]?.min||0;
+    const lv=!m?0:m<25?1:m<60?2:m<120?3:4;
+    const bg=lv?`background:color-mix(in srgb,var(--accent) ${[0,30,50,75,100][lv]}%,transparent);border-color:transparent`:'';
+    return `<div title="${d}: ${m} min" style="${bg}"></div>`;
+  }).join('');
+  $('#notes').innerHTML=S.notes.length?S.notes.slice(0,8).map(n=>`<div class="note"><span class="muted">${n.d} · ${esc(n.t)}</span><br>${esc(n.n)}</div>`).join(''):'<p class="muted">Add a note at the end of a session to see it here.</p>';
+}
+
+/* ---------- Settings and theme ---------- */
+function applyTheme(){
+  const p=PRESETS[S.settings.theme]||PRESETS.aurora,r=document.documentElement.style,st=S.settings,B=document.body;
+  r.setProperty('--bg',p.bg);r.setProperty('--text',p.text);r.setProperty('--muted',p.muted);r.setProperty('--line',p.line);
+  const al=p.light?(.3+st.surf/100*.6):(st.surf/100*.2);r.setProperty('--glass','rgba(255,255,255,'+al.toFixed(3)+')');
+  r.setProperty('--accent',st.accent||p.accent);r.setProperty('--accent2',st.accent2||p.accent2);
+  r.setProperty('--radius',st.radius+'px');r.setProperty('--font',FONTS[st.font]||FONTS.sans);
+  r.setProperty('--blur',st.blur+'px');r.setProperty('--ringw',st.ringW);r.colorScheme=p.light?'light':'dark';r.setProperty('--hl',p.light?'rgba(0,0,0,.14)':'rgba(255,255,255,.22)');document.body.classList.toggle('light',!!p.light);r.setProperty('--bgd',st.bgMotion==='gentle'?1.8:1);
+  B.classList.toggle('still',!st.anim);B.dataset.bg=st.bgStyle;B.classList.toggle('mini',st.sidebar==='mini');B.classList.toggle('compact',st.density==='compact');
+}
+function renderThemes(){
+  $('#themes').innerHTML=Object.entries(PRESETS).map(([k,p])=>`
+    <button class="theme ${S.settings.theme===k?'on':''}" data-th="${k}" style="background:${p.bg};color:${p.text}">
+      <span style="background:linear-gradient(135deg,${p.accent},${p.accent2})"></span>${k[0].toUpperCase()+k.slice(1)}
+    </button>`).join('');
+}
+$('#themes').onclick=e=>{
+  const b=e.target.closest('[data-th]');if(!b)return;
+  S.settings.theme=b.dataset.th;S.settings.accent=null;S.settings.accent2=null;
+  applyTheme();save();renderSettings();
+};
+$('#resetColors').onclick=()=>{S.settings.accent=null;S.settings.accent2=null;applyTheme();save();renderSettings()};
+function renderSettings(){
+  const p=PRESETS[S.settings.theme]||PRESETS.aurora;
+  $$('[data-s]').forEach(el=>{
+    const k=el.dataset.s,v=S.settings[k];
+    if(el.type==='checkbox')el.checked=!!v;
+    else if(k==='accent')el.value=v||p.accent;
+    else if(k==='accent2')el.value=v||p.accent2;
+    else el.value=v;
+  });
+  renderThemes();renderPals();
+}
+$$('[data-s]').forEach(el=>el.addEventListener('input',()=>{
+  const k=el.dataset.s;
+  let v=el.type==='checkbox'?el.checked:(el.type==='range'||el.type==='number')?+el.value:el.value;
+  if(typeof v==='number'&&isNaN(v))return;
+  if(['focus','short','long','every','goal'].includes(k)){v=Math.min(k==='goal'?960:180,Math.max(1,v))}
+  S.settings[k]=v;
+  applyTheme();save();
+  if(['focus','short','long'].includes(k)&&!running)reset();
+  if(k==='noise'||k==='vol')applyNoise();
+  if(k==='notify'&&v&&window.Notification)Notification.requestPermission();
+  renderHeader();renderHome();renderCal();
+  if(k==='anim')document.body.classList.toggle('still',!v);
+}));
+$('#exportBtn').onclick=()=>{
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,2)],{type:'application/json'}));
+  a.download='focus-hub-backup.json';a.click();
+};
+$('#importFile').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const d=JSON.parse(rd.result);
+      if(!d.settings)throw new Error('invalid');
+      S=Object.assign(structuredClone(DEF),d);
+      S.settings=Object.assign(structuredClone(DEF.settings),d.settings);
+      save();renderAll();toast('Backup imported');
+    }catch(err){toast('That file is not a valid backup')}
+  };
+  rd.readAsText(f);e.target.value='';
+};
+$('#eraseBtn').onclick=()=>{
+  if(!confirm('Erase all tasks, plans, notes and stats? This cannot be undone.'))return;
+  stop();S=structuredClone(DEF);cycles=0;SEL=null;FILTER='all';
+  save();renderAll();toast('All data erased');
+};
+
+/* ---------- Navigation and keyboard ---------- */
+function show(v){
+  $('#pageT').textContent=TITLES[v]||'';if(v==='home')renderHome();window.scrollTo(0,0);
+  $$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  $$('.view').forEach(x=>x.classList.toggle('on',x.id===v));
+  if(v==='stats')renderStats();
+  if(v==='planner')renderPlanner();
+  if(v==='settings')renderSettings();
+  if(v==='calendar')renderCal(true);
+  document.body.classList.toggle('heavy',v==='relax');
+  if(v==='relax'){gStart();fStart()}else{gStop();fStop()}
+}
+$$('nav button').forEach(b=>b.onclick=()=>show(b.dataset.v));
+$('#exam').min=TODAY();
+$('#note').addEventListener('keydown',e=>e.stopPropagation());
+document.addEventListener('keydown',e=>{
+  if($('#modal').classList.contains('on')||$('#pal').classList.contains('on')||e.ctrlKey||e.metaKey||e.altKey||/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;
+  if(e.code==='Space'){e.preventDefault();toggle()}
+  if(e.key==='r'||e.key==='R')reset();
+  if(e.key==='n'||e.key==='N')skip();
+  if(e.key==='f'||e.key==='F')zen(!document.body.classList.contains('zen'));
+  const ti='1234567'.indexOf(e.key);if(ti>-1)show(['home','focus','planner','calendar','stats','relax','settings'][ti]);
+});
+
+/* ---------- Init ---------- */
+function renderAll(){
+  applyTheme();
+  reset(mode);
+  renderTasks();renderWeek();renderPlanner();renderStats();renderSettings();renderHeader();renderCal(true);renderHome();
+}
+
+/* ---------- Calendar ---------- */
+const HOL={"2020-01-01":[["New Year's Day","o"]],"2020-01-12":[["National Youth Day","o"]],"2020-01-14":[["Lohri","o"]],"2020-01-15":[["Makar Sankranti","o"]],"2020-01-26":[["Republic Day","g"]],"2020-01-29":[["Basant Panchami","o"]],"2020-02-09":[["Guru Ravidas Jayanti","o"]],"2020-02-21":[["Maha Shivratri","g"]],"2020-03-08":[["Women's Day","o"]],"2020-03-09":[["Holika Dahan","o"]],"2020-03-10":[["Holi","g"]],"2020-03-25":[["Gudi Padwa / Ugadi","o"]],"2020-04-02":[["Ram Navami","g"]],"2020-04-06":[["Mahavir Jayanti","g"]],"2020-04-08":[["Hanuman Jayanti","o"]],"2020-04-10":[["Good Friday","g"]],"2020-04-12":[["Easter Sunday","o"]],"2020-04-14":[["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2020-05-01":[["Labour Day","o"]],"2020-05-07":[["Buddha Purnima","g"]],"2020-05-25":[["Eid ul-Fitr","g"]],"2020-06-23":[["Rath Yatra","o"]],"2020-08-01":[["Eid ul-Adha (Bakrid)","g"]],"2020-08-03":[["Raksha Bandhan","g"]],"2020-08-11":[["Janmashtami","g"]],"2020-08-15":[["Independence Day","g"]],"2020-08-22":[["Ganesh Chaturthi","o"]],"2020-08-30":[["Muharram (Ashura)","g"]],"2020-09-05":[["Teachers' Day","o"]],"2020-10-02":[["Gandhi Jayanti","g"]],"2020-10-17":[["Navratri begins","o"]],"2020-10-25":[["Dussehra","g"]],"2020-10-30":[["Milad-un-Nabi","g"]],"2020-11-04":[["Karwa Chauth","o"]],"2020-11-13":[["Dhanteras","o"]],"2020-11-14":[["Choti Diwali","o"],["Diwali","g"],["Children's Day","o"]],"2020-11-16":[["Govardhan Puja","o"],["Bhai Dooj","o"]],"2020-11-26":[["Constitution Day","o"]],"2020-11-30":[["Guru Nanak Jayanti","g"]],"2020-12-25":[["Christmas","g"]],"2021-01-01":[["New Year's Day","o"]],"2021-01-12":[["National Youth Day","o"]],"2021-01-13":[["Lohri","o"]],"2021-01-14":[["Makar Sankranti","o"]],"2021-01-26":[["Republic Day","g"]],"2021-02-16":[["Basant Panchami","o"]],"2021-02-27":[["Guru Ravidas Jayanti","o"]],"2021-03-08":[["Women's Day","o"]],"2021-03-11":[["Maha Shivratri","g"]],"2021-03-28":[["Holika Dahan","o"]],"2021-03-29":[["Holi","g"]],"2021-04-02":[["Good Friday","g"]],"2021-04-04":[["Easter Sunday","o"]],"2021-04-13":[["Gudi Padwa / Ugadi","o"]],"2021-04-14":[["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2021-04-21":[["Ram Navami","g"]],"2021-04-25":[["Mahavir Jayanti","g"]],"2021-04-27":[["Hanuman Jayanti","o"]],"2021-05-01":[["Labour Day","o"]],"2021-05-14":[["Eid ul-Fitr","g"]],"2021-05-26":[["Buddha Purnima","g"]],"2021-07-12":[["Rath Yatra","o"]],"2021-07-21":[["Eid ul-Adha (Bakrid)","g"]],"2021-08-15":[["Independence Day","g"]],"2021-08-19":[["Muharram (Ashura)","g"]],"2021-08-22":[["Raksha Bandhan","g"]],"2021-08-29":[["Janmashtami","g"]],"2021-09-05":[["Teachers' Day","o"]],"2021-09-10":[["Ganesh Chaturthi","o"]],"2021-10-02":[["Gandhi Jayanti","g"]],"2021-10-07":[["Navratri begins","o"]],"2021-10-15":[["Dussehra","g"]],"2021-10-19":[["Milad-un-Nabi","g"]],"2021-10-24":[["Karwa Chauth","o"]],"2021-11-02":[["Dhanteras","o"]],"2021-11-04":[["Choti Diwali","o"],["Diwali","g"]],"2021-11-05":[["Govardhan Puja","o"]],"2021-11-06":[["Bhai Dooj","o"]],"2021-11-14":[["Children's Day","o"]],"2021-11-19":[["Guru Nanak Jayanti","g"]],"2021-11-26":[["Constitution Day","o"]],"2021-12-25":[["Christmas","g"]],"2022-01-01":[["New Year's Day","o"]],"2022-01-12":[["National Youth Day","o"]],"2022-01-13":[["Lohri","o"]],"2022-01-14":[["Makar Sankranti","o"]],"2022-01-26":[["Republic Day","g"]],"2022-02-05":[["Basant Panchami","o"]],"2022-02-16":[["Guru Ravidas Jayanti","o"]],"2022-03-01":[["Maha Shivratri","g"]],"2022-03-08":[["Women's Day","o"]],"2022-03-17":[["Holika Dahan","o"]],"2022-03-18":[["Holi","g"]],"2022-04-02":[["Gudi Padwa / Ugadi","o"]],"2022-04-10":[["Ram Navami","g"]],"2022-04-14":[["Mahavir Jayanti","g"],["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2022-04-15":[["Good Friday","g"]],"2022-04-16":[["Hanuman Jayanti","o"]],"2022-04-17":[["Easter Sunday","o"]],"2022-05-01":[["Labour Day","o"]],"2022-05-03":[["Eid ul-Fitr","g"]],"2022-05-16":[["Buddha Purnima","g"]],"2022-07-01":[["Rath Yatra","o"]],"2022-07-10":[["Eid ul-Adha (Bakrid)","g"]],"2022-08-09":[["Muharram (Ashura)","g"]],"2022-08-11":[["Raksha Bandhan","g"]],"2022-08-15":[["Independence Day","g"]],"2022-08-18":[["Janmashtami","g"]],"2022-08-31":[["Ganesh Chaturthi","o"]],"2022-09-05":[["Teachers' Day","o"]],"2022-09-26":[["Navratri begins","o"]],"2022-10-02":[["Gandhi Jayanti","g"]],"2022-10-05":[["Dussehra","g"]],"2022-10-09":[["Milad-un-Nabi","g"]],"2022-10-13":[["Karwa Chauth","o"]],"2022-10-22":[["Dhanteras","o"]],"2022-10-24":[["Choti Diwali","o"],["Diwali","g"]],"2022-10-26":[["Govardhan Puja","o"]],"2022-10-27":[["Bhai Dooj","o"]],"2022-11-08":[["Guru Nanak Jayanti","g"]],"2022-11-14":[["Children's Day","o"]],"2022-11-26":[["Constitution Day","o"]],"2022-12-25":[["Christmas","g"]],"2023-01-01":[["New Year's Day","o"]],"2023-01-12":[["National Youth Day","o"]],"2023-01-14":[["Lohri","o"]],"2023-01-15":[["Makar Sankranti","o"]],"2023-01-26":[["Basant Panchami","o"],["Republic Day","g"]],"2023-02-05":[["Guru Ravidas Jayanti","o"]],"2023-02-18":[["Maha Shivratri","g"]],"2023-03-06":[["Holika Dahan","o"]],"2023-03-07":[["Holi","g"]],"2023-03-08":[["Women's Day","o"]],"2023-03-22":[["Gudi Padwa / Ugadi","o"]],"2023-03-30":[["Ram Navami","g"]],"2023-04-04":[["Mahavir Jayanti","g"]],"2023-04-06":[["Hanuman Jayanti","o"]],"2023-04-07":[["Good Friday","g"]],"2023-04-09":[["Easter Sunday","o"]],"2023-04-14":[["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2023-04-22":[["Eid ul-Fitr","g"]],"2023-05-01":[["Labour Day","o"]],"2023-05-05":[["Buddha Purnima","g"]],"2023-06-20":[["Rath Yatra","o"]],"2023-06-29":[["Eid ul-Adha (Bakrid)","g"]],"2023-07-29":[["Muharram (Ashura)","g"]],"2023-08-15":[["Independence Day","g"]],"2023-08-30":[["Raksha Bandhan","g"]],"2023-09-05":[["Teachers' Day","o"]],"2023-09-06":[["Janmashtami","g"]],"2023-09-19":[["Ganesh Chaturthi","o"]],"2023-09-28":[["Milad-un-Nabi","g"]],"2023-10-02":[["Gandhi Jayanti","g"]],"2023-10-15":[["Navratri begins","o"]],"2023-10-24":[["Dussehra","g"]],"2023-11-01":[["Karwa Chauth","o"]],"2023-11-10":[["Dhanteras","o"]],"2023-11-12":[["Choti Diwali","o"],["Diwali","g"]],"2023-11-14":[["Govardhan Puja","o"],["Children's Day","o"]],"2023-11-15":[["Bhai Dooj","o"]],"2023-11-26":[["Constitution Day","o"]],"2023-11-27":[["Guru Nanak Jayanti","g"]],"2023-12-25":[["Christmas","g"]],"2024-01-01":[["New Year's Day","o"]],"2024-01-12":[["National Youth Day","o"]],"2024-01-14":[["Lohri","o"]],"2024-01-15":[["Makar Sankranti","o"]],"2024-01-26":[["Republic Day","g"]],"2024-02-14":[["Basant Panchami","o"]],"2024-02-24":[["Guru Ravidas Jayanti","o"]],"2024-03-08":[["Maha Shivratri","g"],["Women's Day","o"]],"2024-03-24":[["Holika Dahan","o"]],"2024-03-25":[["Holi","g"]],"2024-03-29":[["Good Friday","g"]],"2024-03-31":[["Easter Sunday","o"]],"2024-04-09":[["Gudi Padwa / Ugadi","o"]],"2024-04-11":[["Eid ul-Fitr","g"]],"2024-04-14":[["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2024-04-17":[["Ram Navami","g"]],"2024-04-21":[["Mahavir Jayanti","g"]],"2024-04-23":[["Hanuman Jayanti","o"]],"2024-05-01":[["Labour Day","o"]],"2024-05-23":[["Buddha Purnima","g"]],"2024-06-17":[["Eid ul-Adha (Bakrid)","g"]],"2024-07-07":[["Rath Yatra","o"]],"2024-07-17":[["Muharram (Ashura)","g"]],"2024-08-15":[["Independence Day","g"]],"2024-08-19":[["Raksha Bandhan","g"]],"2024-08-26":[["Janmashtami","g"]],"2024-09-05":[["Teachers' Day","o"]],"2024-09-07":[["Ganesh Chaturthi","o"]],"2024-09-16":[["Milad-un-Nabi","g"]],"2024-10-02":[["Gandhi Jayanti","g"]],"2024-10-03":[["Navratri begins","o"]],"2024-10-12":[["Dussehra","g"]],"2024-10-20":[["Karwa Chauth","o"]],"2024-10-29":[["Dhanteras","o"]],"2024-10-31":[["Choti Diwali","o"],["Diwali","g"]],"2024-11-02":[["Govardhan Puja","o"]],"2024-11-03":[["Bhai Dooj","o"]],"2024-11-14":[["Children's Day","o"]],"2024-11-15":[["Guru Nanak Jayanti","g"]],"2024-11-26":[["Constitution Day","o"]],"2024-12-25":[["Christmas","g"]],"2025-01-01":[["New Year's Day","o"]],"2025-01-12":[["National Youth Day","o"]],"2025-01-13":[["Lohri","o"]],"2025-01-14":[["Makar Sankranti","o"]],"2025-01-26":[["Republic Day","g"]],"2025-02-02":[["Basant Panchami","o"]],"2025-02-12":[["Guru Ravidas Jayanti","o"]],"2025-02-26":[["Maha Shivratri","g"]],"2025-03-08":[["Women's Day","o"]],"2025-03-13":[["Holika Dahan","o"]],"2025-03-14":[["Holi","g"]],"2025-03-30":[["Gudi Padwa / Ugadi","o"]],"2025-03-31":[["Eid ul-Fitr","g"]],"2025-04-06":[["Ram Navami","g"]],"2025-04-10":[["Mahavir Jayanti","g"]],"2025-04-12":[["Hanuman Jayanti","o"]],"2025-04-14":[["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2025-04-18":[["Good Friday","g"]],"2025-04-20":[["Easter Sunday","o"]],"2025-05-01":[["Labour Day","o"]],"2025-05-12":[["Buddha Purnima","g"]],"2025-06-07":[["Eid ul-Adha (Bakrid)","g"]],"2025-06-27":[["Rath Yatra","o"]],"2025-07-06":[["Muharram (Ashura)","g"]],"2025-08-09":[["Raksha Bandhan","g"]],"2025-08-15":[["Independence Day","g"]],"2025-08-16":[["Janmashtami","g"]],"2025-08-27":[["Ganesh Chaturthi","o"]],"2025-09-05":[["Teachers' Day","o"],["Milad-un-Nabi","g"]],"2025-09-22":[["Navratri begins","o"]],"2025-10-02":[["Dussehra","g"],["Gandhi Jayanti","g"]],"2025-10-10":[["Karwa Chauth","o"]],"2025-10-18":[["Dhanteras","o"]],"2025-10-20":[["Choti Diwali","o"],["Diwali","g"]],"2025-10-22":[["Govardhan Puja","o"]],"2025-10-23":[["Bhai Dooj","o"]],"2025-11-05":[["Guru Nanak Jayanti","g"]],"2025-11-14":[["Children's Day","o"]],"2025-11-26":[["Constitution Day","o"]],"2025-12-25":[["Christmas","g"]],"2026-01-01":[["New Year's Day","o"]],"2026-01-12":[["National Youth Day","o"]],"2026-01-13":[["Lohri","o"]],"2026-01-14":[["Makar Sankranti","o"]],"2026-01-23":[["Basant Panchami","o"]],"2026-01-26":[["Republic Day","g"]],"2026-02-01":[["Guru Ravidas Jayanti","o"]],"2026-02-15":[["Maha Shivratri","g"]],"2026-03-02":[["Holika Dahan","o"]],"2026-03-04":[["Holi","g"]],"2026-03-08":[["Women's Day","o"]],"2026-03-21":[["Eid ul-Fitr","g"]],"2026-03-26":[["Ram Navami","g"]],"2026-03-31":[["Mahavir Jayanti","g"]],"2026-04-02":[["Hanuman Jayanti","o"]],"2026-04-03":[["Good Friday","g"]],"2026-04-05":[["Easter Sunday","o"]],"2026-04-14":[["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2026-05-01":[["Buddha Purnima","g"],["Labour Day","o"]],"2026-05-28":[["Eid ul-Adha (Bakrid)","g"]],"2026-06-26":[["Muharram (Ashura)","g"]],"2026-07-16":[["Rath Yatra","o"]],"2026-08-15":[["Independence Day","g"]],"2026-08-26":[["Milad-un-Nabi","g"]],"2026-08-28":[["Raksha Bandhan","g"]],"2026-09-04":[["Janmashtami","g"]],"2026-09-05":[["Teachers' Day","o"]],"2026-09-14":[["Ganesh Chaturthi","o"]],"2026-10-02":[["Gandhi Jayanti","g"]],"2026-10-11":[["Navratri begins","o"]],"2026-10-20":[["Dussehra","g"]],"2026-10-29":[["Karwa Chauth","o"]],"2026-11-06":[["Dhanteras","o"]],"2026-11-08":[["Choti Diwali","o"],["Diwali","g"]],"2026-11-10":[["Govardhan Puja","o"]],"2026-11-11":[["Bhai Dooj","o"]],"2026-11-14":[["Children's Day","o"]],"2026-11-24":[["Guru Nanak Jayanti","g"]],"2026-11-26":[["Constitution Day","o"]],"2026-12-25":[["Christmas","g"]],"2027-01-01":[["New Year's Day","o"]],"2027-01-12":[["National Youth Day","o"]],"2027-01-14":[["Lohri","o"]],"2027-01-15":[["Makar Sankranti","o"]],"2027-01-26":[["Republic Day","g"]],"2027-02-11":[["Basant Panchami","o"]],"2027-02-20":[["Guru Ravidas Jayanti","o"]],"2027-03-06":[["Maha Shivratri","g"]],"2027-03-08":[["Women's Day","o"]],"2027-03-10":[["Eid ul-Fitr","g"]],"2027-03-21":[["Holika Dahan","o"]],"2027-03-22":[["Holi","g"]],"2027-03-26":[["Good Friday","g"]],"2027-03-28":[["Easter Sunday","o"]],"2027-04-07":[["Gudi Padwa / Ugadi","o"]],"2027-04-14":[["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2027-04-15":[["Ram Navami","g"]],"2027-04-19":[["Mahavir Jayanti","g"]],"2027-04-20":[["Hanuman Jayanti","o"]],"2027-05-01":[["Labour Day","o"]],"2027-05-17":[["Eid ul-Adha (Bakrid)","g"]],"2027-05-20":[["Buddha Purnima","g"]],"2027-06-16":[["Muharram (Ashura)","g"]],"2027-07-05":[["Rath Yatra","o"]],"2027-08-15":[["Independence Day","g"],["Milad-un-Nabi","g"]],"2027-08-16":[["Raksha Bandhan","g"]],"2027-08-24":[["Janmashtami","g"]],"2027-09-04":[["Ganesh Chaturthi","o"]],"2027-09-05":[["Teachers' Day","o"]],"2027-10-02":[["Gandhi Jayanti","g"]],"2027-10-09":[["Dussehra","g"]],"2027-10-18":[["Karwa Chauth","o"]],"2027-10-27":[["Dhanteras","o"]],"2027-10-28":[["Choti Diwali","o"]],"2027-10-29":[["Diwali","g"]],"2027-10-30":[["Govardhan Puja","o"]],"2027-10-31":[["Bhai Dooj","o"]],"2027-11-14":[["Guru Nanak Jayanti","g"],["Children's Day","o"]],"2027-11-26":[["Constitution Day","o"]],"2027-12-25":[["Christmas","g"]],"2028-01-01":[["New Year's Day","o"]],"2028-01-12":[["National Youth Day","o"]],"2028-01-14":[["Lohri","o"]],"2028-01-15":[["Makar Sankranti","o"]],"2028-01-26":[["Republic Day","g"]],"2028-01-31":[["Basant Panchami","o"]],"2028-02-10":[["Guru Ravidas Jayanti","o"]],"2028-02-23":[["Maha Shivratri","g"]],"2028-02-27":[["Eid ul-Fitr","g"]],"2028-03-08":[["Women's Day","o"]],"2028-03-10":[["Holika Dahan","o"]],"2028-03-11":[["Holi","g"]],"2028-03-27":[["Gudi Padwa / Ugadi","o"]],"2028-04-04":[["Ram Navami","g"]],"2028-04-07":[["Mahavir Jayanti","g"]],"2028-04-09":[["Hanuman Jayanti","o"]],"2028-04-14":[["Baisakhi","o"],["Good Friday","g"],["Ambedkar Jayanti","g"]],"2028-04-16":[["Easter Sunday","o"]],"2028-05-01":[["Labour Day","o"]],"2028-05-06":[["Eid ul-Adha (Bakrid)","g"]],"2028-05-08":[["Buddha Purnima","g"]],"2028-06-04":[["Muharram (Ashura)","g"]],"2028-06-24":[["Rath Yatra","o"]],"2028-08-04":[["Raksha Bandhan","g"],["Milad-un-Nabi","g"]],"2028-08-13":[["Janmashtami","g"]],"2028-08-15":[["Independence Day","g"]],"2028-08-23":[["Ganesh Chaturthi","o"]],"2028-09-05":[["Teachers' Day","o"]],"2028-09-19":[["Navratri begins","o"]],"2028-09-27":[["Dussehra","g"]],"2028-10-02":[["Gandhi Jayanti","g"]],"2028-10-07":[["Karwa Chauth","o"]],"2028-10-16":[["Dhanteras","o"]],"2028-10-17":[["Choti Diwali","o"],["Diwali","g"]],"2028-10-19":[["Bhai Dooj","o"]],"2028-11-02":[["Guru Nanak Jayanti","g"]],"2028-11-14":[["Children's Day","o"]],"2028-11-26":[["Constitution Day","o"]],"2028-12-25":[["Christmas","g"]],"2029-01-01":[["New Year's Day","o"]],"2029-01-12":[["National Youth Day","o"]],"2029-01-13":[["Lohri","o"]],"2029-01-14":[["Makar Sankranti","o"]],"2029-01-19":[["Basant Panchami","o"]],"2029-01-26":[["Republic Day","g"]],"2029-01-30":[["Guru Ravidas Jayanti","o"]],"2029-02-11":[["Maha Shivratri","g"]],"2029-02-15":[["Eid ul-Fitr","g"]],"2029-02-28":[["Holika Dahan","o"]],"2029-03-01":[["Holi","g"]],"2029-03-08":[["Women's Day","o"]],"2029-03-30":[["Good Friday","g"]],"2029-04-01":[["Easter Sunday","o"]],"2029-04-14":[["Gudi Padwa / Ugadi","o"],["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2029-04-23":[["Ram Navami","g"]],"2029-04-25":[["Eid ul-Adha (Bakrid)","g"]],"2029-04-26":[["Mahavir Jayanti","g"]],"2029-04-28":[["Hanuman Jayanti","o"]],"2029-05-01":[["Labour Day","o"]],"2029-05-24":[["Muharram (Ashura)","g"]],"2029-05-27":[["Buddha Purnima","g"]],"2029-07-13":[["Rath Yatra","o"]],"2029-07-25":[["Milad-un-Nabi","g"]],"2029-08-15":[["Independence Day","g"]],"2029-08-23":[["Raksha Bandhan","g"]],"2029-08-31":[["Janmashtami","g"]],"2029-09-05":[["Teachers' Day","o"]],"2029-09-11":[["Ganesh Chaturthi","o"]],"2029-10-02":[["Gandhi Jayanti","g"]],"2029-10-08":[["Navratri begins","o"]],"2029-10-16":[["Dussehra","g"]],"2029-10-26":[["Karwa Chauth","o"]],"2029-11-04":[["Dhanteras","o"]],"2029-11-05":[["Choti Diwali","o"],["Diwali","g"]],"2029-11-07":[["Govardhan Puja","o"],["Bhai Dooj","o"]],"2029-11-14":[["Children's Day","o"]],"2029-11-21":[["Guru Nanak Jayanti","g"]],"2029-11-26":[["Constitution Day","o"]],"2029-12-25":[["Christmas","g"]],"2030-01-01":[["New Year's Day","o"]],"2030-01-12":[["National Youth Day","o"]],"2030-01-13":[["Lohri","o"]],"2030-01-14":[["Makar Sankranti","o"]],"2030-01-26":[["Republic Day","g"]],"2030-02-05":[["Eid ul-Fitr","g"]],"2030-02-07":[["Basant Panchami","o"]],"2030-02-18":[["Guru Ravidas Jayanti","o"]],"2030-03-02":[["Maha Shivratri","g"]],"2030-03-08":[["Women's Day","o"]],"2030-03-19":[["Holika Dahan","o"]],"2030-03-20":[["Holi","g"]],"2030-04-03":[["Gudi Padwa / Ugadi","o"]],"2030-04-12":[["Ram Navami","g"]],"2030-04-14":[["Baisakhi","o"],["Ambedkar Jayanti","g"],["Eid ul-Adha (Bakrid)","g"]],"2030-04-16":[["Mahavir Jayanti","g"]],"2030-04-18":[["Hanuman Jayanti","o"]],"2030-04-19":[["Good Friday","g"]],"2030-04-21":[["Easter Sunday","o"]],"2030-05-01":[["Labour Day","o"]],"2030-05-13":[["Muharram (Ashura)","g"]],"2030-05-17":[["Buddha Purnima","g"]],"2030-07-02":[["Rath Yatra","o"]],"2030-07-14":[["Milad-un-Nabi","g"]],"2030-08-13":[["Raksha Bandhan","g"]],"2030-08-15":[["Independence Day","g"]],"2030-08-20":[["Janmashtami","g"]],"2030-09-01":[["Ganesh Chaturthi","o"]],"2030-09-05":[["Teachers' Day","o"]],"2030-09-28":[["Navratri begins","o"]],"2030-10-02":[["Gandhi Jayanti","g"]],"2030-10-06":[["Dussehra","g"]],"2030-10-15":[["Karwa Chauth","o"]],"2030-10-24":[["Dhanteras","o"]],"2030-10-25":[["Choti Diwali","o"]],"2030-10-26":[["Diwali","g"]],"2030-10-27":[["Govardhan Puja","o"]],"2030-10-28":[["Bhai Dooj","o"]],"2030-11-10":[["Guru Nanak Jayanti","g"]],"2030-11-14":[["Children's Day","o"]],"2030-11-26":[["Constitution Day","o"]],"2030-12-25":[["Christmas","g"]],"2031-01-01":[["New Year's Day","o"]],"2031-01-12":[["National Youth Day","o"]],"2031-01-14":[["Lohri","o"]],"2031-01-15":[["Makar Sankranti","o"]],"2031-01-25":[["Eid ul-Fitr","g"]],"2031-01-26":[["Republic Day","g"]],"2031-01-27":[["Basant Panchami","o"]],"2031-02-07":[["Guru Ravidas Jayanti","o"]],"2031-02-20":[["Maha Shivratri","g"]],"2031-03-08":[["Holika Dahan","o"],["Women's Day","o"]],"2031-03-09":[["Holi","g"]],"2031-03-24":[["Gudi Padwa / Ugadi","o"]],"2031-04-01":[["Ram Navami","g"]],"2031-04-03":[["Eid ul-Adha (Bakrid)","g"]],"2031-04-05":[["Mahavir Jayanti","g"]],"2031-04-07":[["Hanuman Jayanti","o"]],"2031-04-11":[["Good Friday","g"]],"2031-04-13":[["Easter Sunday","o"]],"2031-04-14":[["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2031-05-01":[["Labour Day","o"]],"2031-05-03":[["Muharram (Ashura)","g"]],"2031-05-07":[["Buddha Purnima","g"]],"2031-06-22":[["Rath Yatra","o"]],"2031-07-03":[["Milad-un-Nabi","g"]],"2031-08-02":[["Raksha Bandhan","g"]],"2031-08-09":[["Janmashtami","g"]],"2031-08-15":[["Independence Day","g"]],"2031-09-05":[["Teachers' Day","o"]],"2031-09-20":[["Ganesh Chaturthi","o"]],"2031-10-02":[["Gandhi Jayanti","g"]],"2031-10-17":[["Navratri begins","o"]],"2031-10-25":[["Dussehra","g"]],"2031-11-02":[["Karwa Chauth","o"]],"2031-11-12":[["Dhanteras","o"]],"2031-11-13":[["Choti Diwali","o"]],"2031-11-14":[["Diwali","g"],["Children's Day","o"]],"2031-11-15":[["Govardhan Puja","o"]],"2031-11-16":[["Bhai Dooj","o"]],"2031-11-26":[["Constitution Day","o"]],"2031-11-28":[["Guru Nanak Jayanti","g"]],"2031-12-25":[["Christmas","g"]],"2032-01-01":[["New Year's Day","o"]],"2032-01-12":[["National Youth Day","o"]],"2032-01-14":[["Lohri","o"]],"2032-01-15":[["Makar Sankranti","o"],["Eid ul-Fitr","g"]],"2032-01-26":[["Republic Day","g"]],"2032-02-15":[["Basant Panchami","o"]],"2032-02-26":[["Guru Ravidas Jayanti","o"]],"2032-03-08":[["Women's Day","o"]],"2032-03-10":[["Maha Shivratri","g"]],"2032-03-23":[["Eid ul-Adha (Bakrid)","g"]],"2032-03-26":[["Holika Dahan","o"],["Good Friday","g"]],"2032-03-27":[["Holi","g"]],"2032-03-28":[["Easter Sunday","o"]],"2032-04-11":[["Gudi Padwa / Ugadi","o"]],"2032-04-14":[["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2032-04-18":[["Ram Navami","g"]],"2032-04-21":[["Muharram (Ashura)","g"]],"2032-04-23":[["Mahavir Jayanti","g"]],"2032-04-25":[["Hanuman Jayanti","o"]],"2032-05-01":[["Labour Day","o"]],"2032-05-25":[["Buddha Purnima","g"]],"2032-06-21":[["Milad-un-Nabi","g"]],"2032-07-09":[["Rath Yatra","o"]],"2032-08-15":[["Independence Day","g"]],"2032-08-20":[["Raksha Bandhan","g"]],"2032-08-27":[["Janmashtami","g"]],"2032-09-05":[["Teachers' Day","o"]],"2032-09-08":[["Ganesh Chaturthi","o"]],"2032-10-02":[["Gandhi Jayanti","g"]],"2032-10-05":[["Navratri begins","o"]],"2032-10-14":[["Dussehra","g"]],"2032-10-21":[["Karwa Chauth","o"]],"2032-10-31":[["Dhanteras","o"]],"2032-11-02":[["Choti Diwali","o"],["Diwali","g"]],"2032-11-04":[["Govardhan Puja","o"],["Bhai Dooj","o"]],"2032-11-14":[["Children's Day","o"]],"2032-11-17":[["Guru Nanak Jayanti","g"]],"2032-11-26":[["Constitution Day","o"]],"2032-12-25":[["Christmas","g"]],"2033-01-01":[["New Year's Day","o"]],"2033-01-03":[["Eid ul-Fitr","g"]],"2033-01-12":[["National Youth Day","o"]],"2033-01-13":[["Lohri","o"]],"2033-01-14":[["Makar Sankranti","o"]],"2033-01-26":[["Republic Day","g"]],"2033-02-04":[["Basant Panchami","o"]],"2033-02-14":[["Guru Ravidas Jayanti","o"]],"2033-02-27":[["Maha Shivratri","g"]],"2033-03-08":[["Women's Day","o"]],"2033-03-12":[["Eid ul-Adha (Bakrid)","g"]],"2033-03-15":[["Holika Dahan","o"]],"2033-03-16":[["Holi","g"]],"2033-03-31":[["Gudi Padwa / Ugadi","o"]],"2033-04-07":[["Ram Navami","g"]],"2033-04-11":[["Muharram (Ashura)","g"]],"2033-04-12":[["Mahavir Jayanti","g"]],"2033-04-14":[["Hanuman Jayanti","o"],["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2033-04-15":[["Good Friday","g"]],"2033-04-17":[["Easter Sunday","o"]],"2033-05-01":[["Labour Day","o"]],"2033-05-14":[["Buddha Purnima","g"]],"2033-06-10":[["Milad-un-Nabi","g"]],"2033-06-28":[["Rath Yatra","o"]],"2033-08-10":[["Raksha Bandhan","g"]],"2033-08-15":[["Independence Day","g"]],"2033-08-17":[["Janmashtami","g"]],"2033-08-28":[["Ganesh Chaturthi","o"]],"2033-09-05":[["Teachers' Day","o"]],"2033-09-24":[["Navratri begins","o"]],"2033-10-02":[["Gandhi Jayanti","g"]],"2033-10-03":[["Dussehra","g"]],"2033-10-11":[["Karwa Chauth","o"]],"2033-10-20":[["Dhanteras","o"]],"2033-10-22":[["Choti Diwali","o"],["Diwali","g"]],"2033-10-24":[["Govardhan Puja","o"]],"2033-10-25":[["Bhai Dooj","o"]],"2033-11-06":[["Guru Nanak Jayanti","g"]],"2033-11-14":[["Children's Day","o"]],"2033-11-26":[["Constitution Day","o"]],"2033-12-24":[["Eid ul-Fitr","g"]],"2033-12-25":[["Christmas","g"]],"2034-01-01":[["New Year's Day","o"]],"2034-01-12":[["National Youth Day","o"]],"2034-01-13":[["Lohri","o"]],"2034-01-14":[["Makar Sankranti","o"]],"2034-01-24":[["Basant Panchami","o"]],"2034-01-26":[["Republic Day","g"]],"2034-02-03":[["Guru Ravidas Jayanti","o"]],"2034-02-17":[["Maha Shivratri","g"]],"2034-03-02":[["Eid ul-Adha (Bakrid)","g"]],"2034-03-04":[["Holika Dahan","o"]],"2034-03-05":[["Holi","g"]],"2034-03-08":[["Women's Day","o"]],"2034-03-21":[["Gudi Padwa / Ugadi","o"]],"2034-03-28":[["Ram Navami","g"]],"2034-03-31":[["Muharram (Ashura)","g"]],"2034-04-01":[["Mahavir Jayanti","g"]],"2034-04-03":[["Hanuman Jayanti","o"]],"2034-04-07":[["Good Friday","g"]],"2034-04-09":[["Easter Sunday","o"]],"2034-04-14":[["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2034-05-01":[["Labour Day","o"]],"2034-05-03":[["Buddha Purnima","g"]],"2034-05-31":[["Milad-un-Nabi","g"]],"2034-07-17":[["Rath Yatra","o"]],"2034-08-15":[["Independence Day","g"]],"2034-08-29":[["Raksha Bandhan","g"]],"2034-09-05":[["Janmashtami","g"],["Teachers' Day","o"]],"2034-09-16":[["Ganesh Chaturthi","o"]],"2034-10-02":[["Gandhi Jayanti","g"]],"2034-10-13":[["Navratri begins","o"]],"2034-10-22":[["Dussehra","g"]],"2034-10-30":[["Karwa Chauth","o"]],"2034-11-08":[["Dhanteras","o"]],"2034-11-09":[["Choti Diwali","o"]],"2034-11-10":[["Diwali","g"]],"2034-11-12":[["Govardhan Puja","o"],["Bhai Dooj","o"]],"2034-11-14":[["Children's Day","o"]],"2034-11-25":[["Guru Nanak Jayanti","g"]],"2034-11-26":[["Constitution Day","o"]],"2034-12-13":[["Eid ul-Fitr","g"]],"2034-12-25":[["Christmas","g"]],"2035-01-01":[["New Year's Day","o"]],"2035-01-12":[["National Youth Day","o"]],"2035-01-14":[["Lohri","o"]],"2035-01-15":[["Makar Sankranti","o"]],"2035-01-26":[["Republic Day","g"]],"2035-02-13":[["Basant Panchami","o"]],"2035-02-19":[["Eid ul-Adha (Bakrid)","g"]],"2035-02-22":[["Guru Ravidas Jayanti","o"]],"2035-03-08":[["Maha Shivratri","g"],["Women's Day","o"]],"2035-03-21":[["Muharram (Ashura)","g"]],"2035-03-23":[["Holika Dahan","o"],["Good Friday","g"]],"2035-03-24":[["Holi","g"]],"2035-03-25":[["Easter Sunday","o"]],"2035-04-09":[["Gudi Padwa / Ugadi","o"]],"2035-04-14":[["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2035-04-16":[["Ram Navami","g"]],"2035-04-20":[["Mahavir Jayanti","g"]],"2035-04-22":[["Hanuman Jayanti","o"]],"2035-05-01":[["Labour Day","o"]],"2035-05-21":[["Milad-un-Nabi","g"]],"2035-05-22":[["Buddha Purnima","g"]],"2035-07-07":[["Rath Yatra","o"]],"2035-08-15":[["Independence Day","g"]],"2035-08-18":[["Raksha Bandhan","g"]],"2035-08-26":[["Janmashtami","g"]],"2035-09-05":[["Ganesh Chaturthi","o"],["Teachers' Day","o"]],"2035-10-02":[["Navratri begins","o"],["Gandhi Jayanti","g"]],"2035-10-11":[["Dussehra","g"]],"2035-10-20":[["Karwa Chauth","o"]],"2035-10-28":[["Dhanteras","o"]],"2035-10-30":[["Choti Diwali","o"],["Diwali","g"]],"2035-11-01":[["Govardhan Puja","o"],["Bhai Dooj","o"]],"2035-11-14":[["Children's Day","o"]],"2035-11-15":[["Guru Nanak Jayanti","g"]],"2035-11-26":[["Constitution Day","o"]],"2035-12-02":[["Eid ul-Fitr","g"]],"2035-12-25":[["Christmas","g"]],"2036-01-01":[["New Year's Day","o"]],"2036-01-12":[["National Youth Day","o"]],"2036-01-14":[["Lohri","o"]],"2036-01-15":[["Makar Sankranti","o"]],"2036-01-26":[["Republic Day","g"]],"2036-02-02":[["Basant Panchami","o"]],"2036-02-08":[["Eid ul-Adha (Bakrid)","g"]],"2036-02-11":[["Guru Ravidas Jayanti","o"]],"2036-02-25":[["Maha Shivratri","g"]],"2036-03-08":[["Women's Day","o"]],"2036-03-09":[["Muharram (Ashura)","g"]],"2036-03-11":[["Holika Dahan","o"]],"2036-03-12":[["Holi","g"]],"2036-03-28":[["Gudi Padwa / Ugadi","o"]],"2036-04-05":[["Ram Navami","g"]],"2036-04-10":[["Hanuman Jayanti","o"]],"2036-04-11":[["Good Friday","g"]],"2036-04-13":[["Easter Sunday","o"]],"2036-04-14":[["Baisakhi","o"],["Ambedkar Jayanti","g"]],"2036-05-01":[["Labour Day","o"]],"2036-05-09":[["Milad-un-Nabi","g"]],"2036-05-10":[["Buddha Purnima","g"]],"2036-06-25":[["Rath Yatra","o"]],"2036-08-06":[["Raksha Bandhan","g"]],"2036-08-14":[["Janmashtami","g"]],"2036-08-15":[["Independence Day","g"]],"2036-08-25":[["Ganesh Chaturthi","o"]],"2036-09-05":[["Teachers' Day","o"]],"2036-09-29":[["Dussehra","g"]],"2036-10-02":[["Gandhi Jayanti","g"]],"2036-10-08":[["Karwa Chauth","o"]],"2036-10-17":[["Dhanteras","o"]],"2036-10-18":[["Choti Diwali","o"]],"2036-10-19":[["Diwali","g"]],"2036-10-20":[["Govardhan Puja","o"]],"2036-10-21":[["Bhai Dooj","o"]],"2036-11-04":[["Guru Nanak Jayanti","g"]],"2036-11-14":[["Children's Day","o"]],"2036-11-20":[["Eid ul-Fitr","g"]],"2036-11-26":[["Constitution Day","o"]],"2036-12-25":[["Christmas","g"]]};
+const CMIN='2020-01-01',CMAX='2036-12-31',MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const WS=()=>+S.settings.weekStart||0;
+let CV=S.settings.calView||'month',CD=TODAY(),EDIT=null,KIND='Event';
+const hol=d=>S.calHol===false?[]:(HOL[d]||[]);
+const KC={Event:'#7c5cff',Task:'#3b82f6',Deadline:'#ef4444'};
+function evOn(d){return (S.events||[]).filter(e=>{
+  if(!e.r)return d>=e.d&&d<=(e.d2||e.d);
+  if(d<e.d)return false;const a=parse(e.d),b=parse(d);
+  return e.r==='d'||(e.r==='w'&&a.getDay()===b.getDay())||(e.r==='m'&&a.getDate()===b.getDate())||(e.r==='y'&&a.getDate()===b.getDate()&&a.getMonth()===b.getMonth());
+}).sort((x,y)=>(y.all?1:0)-(x.all?1:0)||(x.s||'').localeCompare(y.s||''))}
+const ico=e=>e.k==='Deadline'?'⏰ ':e.k==='Task'?'☑ ':'';
+const evChip=e=>`<span class="ev ${e.done?'done':''}" style="background:${e.c}" data-eid="${e.id}" title="${esc(e.t)}">${e.all?'':e.s+' '}${ico(e)}${esc(e.t)}</span>`;
+const holChip=h=>`<span class="ev hol ${h[1]}" title="${esc(h[0])}">${esc(h[0])}</span>`;
+function agenda(){
+  const s=CD,hs=hol(s),ev=evOn(s);
+  return `<div class="agenda"><h3><span>${parse(s).toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long'})}</span><button class="pri" data-add="${s}">+ Add</button></h3>${hs.map(x=>`<div class="li"><span class="dot" style="background:${x[1]==='g'?'#34d399':'#fbbf24'}"></span>${esc(x[0])}</div>`).join('')}${ev.map(e=>`<div class="li" data-eid="${e.id}"><span class="dot" style="background:${e.c}"></span><span style="flex:1">${esc(e.t)}</span><span class="pill">${e.all?'All day':e.s}</span></div>`).join('')}${hs.length||ev.length?'':'<p class="muted">Nothing planned.</p>'}</div>`;
+}
+function renderMonth(){
+  const f=parse(CD);f.setDate(1);const st=new Date(f);st.setDate(1-((f.getDay()-WS()+7)%7));
+  let h=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map((x,i,a)=>a[(i+WS())%7]).map(x=>`<div class="dh">${x}</div>`).join('');
+  for(let i=0;i<42;i++){
+    const d=new Date(st);d.setDate(st.getDate()+i);const s=fmt(d);
+    const it=[...hol(s).map(holChip),...evOn(s).map(evChip)];
+    h+=`<div data-d="${s}" class="${d.getMonth()!==f.getMonth()?'out':''} ${s===TODAY()?'today':''} ${s===CD?'sel':''}"><span class="dn">${d.getDate()}</span>${it.slice(0,3).join('')}${it.length>3?`<span class="more" data-more="${s}">+${it.length-3} more</span>`:''}</div>`;
+  }
+  return `<div class="mg">${h}</div>${agenda()}`;
+}
+function renderTime(n){
+  const b=parse(CD);if(n===7)b.setDate(b.getDate()-((b.getDay()-WS()+7)%7));
+  const days=[...Array(n)].map((_,i)=>{const d=new Date(b);d.setDate(b.getDate()+i);return fmt(d)});
+  const cols=`52px repeat(${n},minmax(0,1fr))`,mw=n>1?'min-width:700px':'';
+  const m=t=>{const [a,c]=t.split(':');return +a*60+ +c},nw=new Date(),nm=nw.getHours()*60+nw.getMinutes();
+  const head=`<div class="wh" style="grid-template-columns:${cols};${mw}"><div style="border:0"></div>${days.map(s=>`<div data-d="${s}" class="${s===TODAY()?'today':''}">${wd(s)}<br><span class="dn">${parse(s).getDate()}</span>${hol(s).map(holChip).join('')}${evOn(s).filter(e=>e.all).map(evChip).join('')}</div>`).join('')}</div>`;
+  const col=s=>{
+    const L=[],ev=evOn(s).filter(e=>!e.all).map(e=>({e,a:m(e.s)})).sort((x,y)=>x.a-y.a);
+    ev.forEach(o=>{o.b=Math.max(o.a+30,m(o.e.e||o.e.s));let l=0;while(L[l]>o.a)l++;L[l]=o.b;o.l=l});
+    const n2=L.length||1;
+    return `<div class="col" data-d="${s}">${'<div class="sl"></div>'.repeat(24)}${ev.map(o=>`<span class="ev ${o.e.done?'done':''}" data-eid="${o.e.id}" style="background:${o.e.c};top:${o.a/60*48}px;height:${Math.max(20,(o.b-o.a)/60*48-2)}px;left:${o.l/n2*100}%;right:${100-(o.l+1)/n2*100}%"><b>${o.e.s}</b> ${ico(o.e)}${esc(o.e.t)}</span>`).join('')}${s===TODAY()?`<div class="now" style="top:${nm/60*48}px"></div>`:''}</div>`;
+  };
+  const hrs=`<div>${[...Array(24)].map((_,h)=>`<div class="hr">${h?(S.settings.h24?String(h).padStart(2,'0')+':00':(h%12||12)+(h<12?' AM':' PM')):''}</div>`).join('')}</div>`;
+  return `<div class="wk"><div style="${mw}">${head}<div class="wb" style="grid-template-columns:${cols}">${hrs}${days.map(col).join('')}</div></div></div>`;
+}
+function calTitle(){
+  const d=parse(CD);
+  if(CV==='month')return MON[d.getMonth()]+' '+d.getFullYear();
+  if(CV==='day')return d.toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const a=new Date(d);a.setDate(d.getDate()-((d.getDay()-WS()+7)%7));const z=new Date(a);z.setDate(a.getDate()+6);
+  const o={month:'short',day:'numeric'};return a.toLocaleDateString('en-US',o)+' – '+z.toLocaleDateString('en-US',o)+', '+z.getFullYear();
+}
+function renderUp(){
+  const t=TODAY(),ev=[],hs=[];
+  for(let i=0;i<400&&(ev.length<8||hs.length<4);i++){
+    const d=addDays(t,i);if(d>CMAX)break;
+    evOn(d).filter(e=>!e.done).forEach(e=>{if(ev.length<8)ev.push([d,e])});
+    hol(d).filter(h=>h[1]==='g').forEach(h=>{if(hs.length<4)hs.push([d,h])});
+  }
+  const f=d=>parse(d).toLocaleDateString('en-US',{weekday:'short',day:'numeric',month:'short'});
+  $('#cUp').innerHTML=(ev.length?ev.map(([d,e])=>`<div class="up" data-eid="${e.id}"><i style="background:${e.c}"></i><div>${esc(e.t)}<small>${f(d)}${e.all?'':' · '+e.s}${e.k!=='Event'?' · '+e.k:''}</small></div></div>`).join(''):'<p class="muted">Nothing scheduled. Press Create to add events, tasks and deadlines.</p>')
+   +`<h3 style="margin:18px 0 4px">Next holidays</h3>`+hs.map(([d,h])=>`<div class="up"><i style="background:#34d399"></i><div>${esc(h[0])}<small>${f(d)}</small></div></div>`).join('');
+}
+function renderCal(fresh){
+  const old=$('#cBody .wk'),st=old?old.scrollTop:null;
+  $('#cBody').innerHTML=CV==='month'?renderMonth():renderTime(CV==='week'?7:1);
+  const w=$('#cBody .wk');if(w)w.scrollTop=(st!==null&&!fresh)?st:48*7;
+  $('#cTitle').textContent=calTitle();$('#cHol').checked=S.calHol!==false;
+  $$('#cSeg button').forEach(b=>b.classList.toggle('on',b.dataset.cv===CV));
+  $('#cNow').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:!S.settings.h24});
+  renderUp();
+}
+function cNav(n){
+  const d=parse(CD);
+  if(CV==='month'){d.setDate(1);d.setMonth(d.getMonth()+n)}else d.setDate(d.getDate()+n*(CV==='week'?7:1));
+  const s=fmt(d);if(s<CMIN||s>CMAX){toast('The calendar runs from January 2020 to December 2036');return}
+  CD=s;renderCal(true);
+}
+$('#cPrev').onclick=()=>cNav(-1);$('#cNext').onclick=()=>cNav(1);
+$('#cToday').onclick=()=>{CD=TODAY();renderCal(true)};
+$('#cSeg').onclick=e=>{const b=e.target.closest('[data-cv]');if(b){CV=b.dataset.cv;renderCal(true)}};
+$('#cHol').onchange=()=>{S.calHol=$('#cHol').checked;save();renderCal()};
+$('#cNew').onclick=()=>openEv(null,CD);
+$('#cBody').onclick=e=>{
+  const ev=e.target.closest('[data-eid]');if(ev){openEv(ev.dataset.eid);return}
+  const mo=e.target.closest('[data-more]');if(mo){CD=mo.dataset.more;CV='day';renderCal(true);return}
+  const c=e.target.closest('.col');
+  if(c){const y=e.clientY-c.getBoundingClientRect().top;openEv(null,c.dataset.d,String(Math.min(23,Math.max(0,Math.floor(y/48)))).padStart(2,'0')+':00');return}
+  const ad=e.target.closest('[data-add]');if(ad){openEv(null,ad.dataset.add);return}
+  const d=e.target.closest('[data-d]');if(d){if(CV==='month'&&matchMedia('(max-width:860px)').matches){CD=d.dataset.d;renderCal();return}openEv(null,d.dataset.d)}
+};
+$('#cUp').onclick=e=>{const u=e.target.closest('[data-eid]');if(u)openEv(u.dataset.eid)};
+const pickKind=k=>{KIND=k;$$('#eKind .chip').forEach(c=>c.classList.toggle('on',c.dataset.k===k))};
+$('#eKind').onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;pickKind(b.dataset.k);if(!EDIT)$('#eC').value=KC[KIND]};
+const timesVis=()=>$('#eTimes').style.display=$('#eAll').checked?'none':'grid';
+$('#eAll').onchange=timesVis;
+function openEv(id,d,tm){
+  const e=id?S.events.find(x=>x.id===id):null,v=(k,x)=>$(k).value=x;EDIT=e?e.id:null;
+  $('#mTitle').textContent=e?'Edit event':'New event';
+  v('#eT',e?e.t:'');pickKind(e?e.k:'Event');v('#eD',e?e.d:(d||CD));v('#eD2',e?(e.d2||e.d):(d||CD));
+  $('#eAll').checked=e?e.all:!tm;
+  v('#eS',e?(e.s||'09:00'):(tm||'09:00'));v('#eE',e?(e.e||'10:00'):(tm?String(Math.min(23,+tm.slice(0,2)+1)).padStart(2,'0')+tm.slice(2):'10:00'));
+  v('#eR',e?(e.r||''):'');v('#eC',e?e.c:KC.Event);v('#eL',e?(e.l||''):'');v('#eN',e?(e.n||''):'');
+  $('#eDone').checked=!!(e&&e.done);$('#eDoneW').style.display=e?'flex':'none';$('#eDel').style.visibility=e?'visible':'hidden';
+  timesVis();$('#modal').classList.add('on');setTimeout(()=>$('#eT').focus(),50);
+}
+const closeEv=()=>$('#modal').classList.remove('on');
+$('#mX').onclick=closeEv;$('#modal').onclick=e=>{if(e.target.id==='modal')closeEv()};
+$('#eT').onkeydown=e=>{e.stopPropagation();if(e.key==='Enter')$('#eSave').click()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeEv()});
+$('#eSave').onclick=()=>{
+  const t=$('#eT').value.trim();if(!t){toast('Add a title first');return}
+  const all=$('#eAll').checked;let d=$('#eD').value,d2=$('#eD2').value||d;
+  if(!d){toast('Pick a date');return}
+  if(d2<d)d2=d;if(!all)d2=d;
+  if(d<CMIN||d>CMAX){toast('Dates must fall between 2020 and 2036');return}
+  const s=$('#eS').value||'09:00',en=$('#eE').value||s;
+  if(!all&&en<=s){toast('End time must be after the start time');return}
+  const o={id:EDIT||uid(),t,k:KIND,d,d2,all,s:all?'':s,e:all?'':en,r:$('#eR').value,c:$('#eC').value,l:$('#eL').value.trim(),n:$('#eN').value.trim(),done:$('#eDone').checked};
+  const i=S.events.findIndex(x=>x.id===o.id);if(i>-1)S.events[i]=o;else S.events.push(o);
+  save();closeEv();CD=d;renderCal(!all?false:true);toast(i>-1?'Event updated':'Event added');
+};
+$('#eDel').onclick=()=>{if(!EDIT)return;S.events=S.events.filter(x=>x.id!==EDIT);save();closeEv();renderCal();toast('Event deleted')};
+setInterval(()=>{if($('#calendar').classList.contains('on')&&!$('#modal').classList.contains('on'))renderCal()},30000);
+
+/* ---------- Ambient soundscapes ---------- */
+function ctx(){actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();return actx}
+function nb(c,sec,kind){
+  const f=Math.floor(c.sampleRate*.5),n=Math.floor(c.sampleRate*sec),m=n+f,b=c.createBuffer(2,n,c.sampleRate);
+  for(let ch=0;ch<2;ch++){
+    const s=new Float32Array(m);let l=0,b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0,pk=1e-6;
+    for(let i=0;i<m;i++){
+      const w=Math.random()*2-1;
+      if(kind==='pink'){b0=.99886*b0+w*.0555179;b1=.99332*b1+w*.0750759;b2=.969*b2+w*.153852;b3=.8665*b3+w*.3104856;b4=.55*b4+w*.5329522;b5=-.7616*b5-w*.016898;s[i]=b0+b1+b2+b3+b4+b5+b6+w*.5362;b6=w*.115926}
+      else if(kind==='brown'){l=(l+.02*w)/1.02;s[i]=l}else s[i]=w;
+      pk=Math.max(pk,Math.abs(s[i]));
+    }
+    const d=b.getChannelData(ch);
+    for(let i=0;i<n;i++){let v=s[i];if(i<f){const a=i/f*Math.PI/2;v=s[i]*Math.sin(a)+s[n+i]*Math.cos(a)}d[i]=v/pk*.9}
+  }
+  return b;
+}
+const lay=(c,buf,chain,gain,dest)=>{
+  const s=c.createBufferSource();s.buffer=buf;s.loop=true;
+  let node=s,first=null;
+  chain.forEach(([type,freq,q,gn])=>{const f=c.createBiquadFilter();f.type=type;f.frequency.value=freq;f.Q.value=q;if(gn!==undefined)f.gain.value=gn;node.connect(f);node=f;first=first||f});
+  const g=c.createGain();g.gain.value=gain;node.connect(g).connect(dest);s.start();return{s,f:first,g};
+};
+function chainOut(c,v,hz){
+  const out=c.createGain();out.gain.value=v;out.connect(c.destination);
+  const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=hz;lp.Q.value=.5;
+  const fade=c.createGain();fade.gain.value=0;fade.gain.setTargetAtTime(1,c.currentTime,.6);
+  fade.connect(lp).connect(out);return{out,fade};
+}
+const closer=(c,out,fade,iv,layers)=>({gain:out,stop(){
+  iv.forEach(clearInterval);fade.gain.cancelScheduledValues(c.currentTime);fade.gain.setTargetAtTime(0,c.currentTime,.25);
+  setTimeout(()=>{layers.forEach(o=>{try{o.s.stop()}catch(e){}});out.disconnect()},1500);
+}});
+function dropBuf(c,sec,rate){
+  const sr=c.sampleRate,n=Math.floor(sr*sec),b=c.createBuffer(2,n,sr);
+  for(let ch=0;ch<2;ch++){
+    const d=b.getChannelData(ch),cnt=Math.floor(sec*rate);
+    for(let k=0;k<cnt;k++){
+      const st=Math.floor(Math.random()*n),f=500+Math.pow(Math.random(),2)*1900,amp=.12+Math.pow(Math.random(),3)*.88,tau=(.004+Math.random()*.014)*sr,len=Math.floor(tau*6);let ph=0;
+      for(let i=0;i<len;i++){ph+=6.2832*f*(1+i/sr*35)/sr;d[(st+i)%n]+=Math.sin(ph)*Math.exp(-i/tau)*amp*(1-Math.exp(-i/(.0008*sr)))}
+    }
+    let pk=1e-6;for(let i=0;i<n;i++)pk=Math.max(pk,Math.abs(d[i]));for(let i=0;i<n;i++)d[i]=d[i]/pk*.8;
+  }
+  return b;
+}
+const SND={
+  white(c,v){
+    const {out,fade}=chainOut(c,v,6000);
+    const a=lay(c,nb(c,10,'white'),[['highpass',60,.5],['lowpass',6500,.4]],.2,fade);
+    return closer(c,out,fade,[],[a]);
+  },
+  brown(c,v){
+    const {out,fade}=chainOut(c,v,900);
+    const a=lay(c,nb(c,12,'brown'),[['highpass',22,.5],['lowpass',700,.4]],.75,fade);
+    return closer(c,out,fade,[],[a]);
+  },
+  ocean(c,v){
+    const {out,fade}=chainOut(c,v,5000);
+    const body=lay(c,nb(c,12,'pink'),[['lowpass',300,.4]],.1,fade);
+    const foam=lay(c,nb(c,10,'pink'),[['bandpass',1500,.5],['lowpass',3800,.5]],.0001,fade);
+    const deep=lay(c,nb(c,12,'brown'),[['lowpass',130,.3]],.3,fade);
+    let t=c.currentTime+.2;
+    const plan=()=>{
+      while(t<c.currentTime+14){
+        const rise=3.5+Math.random()*2.5,fall=4.5+Math.random()*3.5,pk=.5+Math.random()*.5,gap=Math.random()*1.5;
+        body.g.gain.setValueAtTime(.1,t);body.g.gain.linearRampToValueAtTime(.1+pk*.45,t+rise);body.g.gain.linearRampToValueAtTime(.1,t+rise+fall);
+        body.f.frequency.setValueAtTime(240,t);body.f.frequency.exponentialRampToValueAtTime(650+pk*600,t+rise);body.f.frequency.exponentialRampToValueAtTime(240,t+rise+fall);
+        foam.g.gain.setValueAtTime(.0001,t+rise*.55);foam.g.gain.linearRampToValueAtTime(.09*pk,t+rise+.5);foam.g.gain.exponentialRampToValueAtTime(.0001,t+rise+fall);
+        t+=rise+fall+gap;
+      }
+    };
+    plan();return closer(c,out,fade,[setInterval(plan,2000)],[body,foam,deep]);
+  },
+  rain(c,v){
+    const {out,fade}=chainOut(c,v,3400),gm=c.createGain();gm.gain.value=1;gm.connect(fade);
+    const bed=lay(c,nb(c,14,'pink'),[['highpass',170,.4],['lowpass',2400,.4],['peaking',900,.6,4]],.3,gm);
+    const body=lay(c,nb(c,12,'brown'),[['lowpass',520,.3]],.2,gm);
+    const d1=lay(c,dropBuf(c,10,90),[['lowpass',2800,.4]],.2,fade),d2=lay(c,dropBuf(c,13,60),[['lowpass',2200,.4]],.16,fade);
+    d2.s.playbackRate.value=.87;
+    const L=[],mod=(hz,dp)=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=hz;g.gain.value=dp;o.connect(g).connect(gm.gain);o.start();L.push({s:o})};
+    mod(.05,.1);mod(.13,.05);
+    return closer(c,out,fade,[],[bed,body,d1,d2,...L]);
+  }
+};
+function beat(c,v,hz,car){
+  const {out,fade}=chainOut(c,v,4000),L=[],bed=lay(c,nb(c,12,'pink'),[['lowpass',700,.3]],.05,fade);
+  if(S.settings.beatMode==='isochronic'){
+    const o=c.createOscillator(),lfo=c.createOscillator(),am=c.createGain(),dp=c.createGain();
+    o.frequency.value=car;lfo.frequency.value=hz;am.gain.value=.14;dp.gain.value=.12;
+    lfo.connect(dp).connect(am.gain);o.connect(am).connect(fade);o.start();lfo.start();L.push({s:o},{s:lfo});
+  }else{
+    [[car,-1],[car+hz,1]].forEach(([f,pan])=>{
+      const o=c.createOscillator(),g=c.createGain(),p=c.createStereoPanner?c.createStereoPanner():c.createGain();
+      o.frequency.value=f;g.gain.value=.16;if(p.pan)p.pan.value=pan;o.connect(g).connect(p).connect(fade);o.start();L.push({s:o});
+    });
+  }
+  return closer(c,out,fade,[],[bed,...L]);
+}
+SND.alpha=(c,v)=>beat(c,v,10,200);SND.gamma=(c,v)=>beat(c,v,40,220);
+const SOUNDS={white:{n:'White noise',d:'Soft, even hiss that masks distractions.'},brown:{n:'Brown noise',d:'Deep, warm rumble for steady concentration.'},ocean:{n:'Ocean waves',d:'Slow swells rolling in and washing out.'},rain:{n:'Rain',d:'Gentle rainfall with soft droplets.'},alpha:{n:'Alpha waves (10 Hz)',d:'Relaxed, calm focus. Use headphones.'},gamma:{n:'Gamma waves (40 Hz)',d:'Alert, deep-work tone. Use headphones.'}};
+const MIX={};let SLP=null;
+$('#mix').innerHTML=Object.entries(SOUNDS).map(([k,o])=>`<div class="snd" id="snd-${k}"><div><b>${o.n}</b><div class="muted">${o.d}</div></div><div class="row" style="flex-wrap:nowrap"><button class="pri" data-snd="${k}">Play</button><input type="range" data-sv="${k}" min="0" max="100" value="${k==='alpha'||k==='gamma'?35:60}"></div></div>`).join('');
+function mixSet(k,on){
+  if(MIX[k]){MIX[k].stop();delete MIX[k]}
+  if(on)MIX[k]=SND[k](ctx(),+$(`[data-sv=${k}]`).value/100);
+  $(`[data-snd=${k}]`).textContent=on?'Stop':'Play';$('#snd-'+k).classList.toggle('on',on);
+}
+$$('[data-snd]').forEach(b=>b.onclick=()=>mixSet(b.dataset.snd,!MIX[b.dataset.snd]));
+$$('[data-sv]').forEach(s=>s.oninput=()=>{const m=MIX[s.dataset.sv];if(m)m.gain.gain.value=s.value/100});
+$('#sStop').onclick=()=>Object.keys(MIX).forEach(k=>mixSet(k,false));
+$('#sleep').onchange=()=>{clearTimeout(SLP);const m=+$('#sleep').value;if(m)SLP=setTimeout(()=>{$('#sStop').click();$('#sleep').value='0';toast('Sleep timer finished')},m*60000)};
+
+
+/* ---------- 3D particle galaxy ---------- */
+const isMob=()=>innerWidth<760,rnd=Math.random,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const gc=$('#galaxy'),gg=gc.getContext('2d');
+const GX={on:false,vis:true,n:0,raf:0,last:0,w:0,h:0,R:320,D0:864,f:600,yaw:.4,pitch:.95,zoom:1,idle:0,wx:0,wz:0,has:false,act:false,mx:0,my:0,rot:0,flash:0,rings:[],sparks:[],neb:[],stars:[],ptr:new Map(),moved:0,sx:0,sy:0,pd:0};
+const GCOL=['#ff9a52','#ffb36b','#ffc98a','#ffdca8','#fff0d0','#ffffff','#e6efff','#cfe0ff','#b3ceff','#98bcff','#7fa8ff','#6b94ff','#ffffff'];
+const GK=4,GS2=900,GSPR={};
+const mkSpr=rgb=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,`rgba(${rgb},1)`);g.addColorStop(.35,`rgba(${rgb},.35)`);g.addColorStop(1,`rgba(${rgb},0)`);x.fillStyle=g;x.fillRect(0,0,128,128);return c};
+['255,110,170','90,160,255','170,120,255','255,200,130','190,215,255'].forEach((c,i)=>GSPR[i]=mkSpr(c));
+$('#gCount').innerHTML=(isMob()?[1500,2500,4000]:[3000,5000,8000]).map((n,i)=>`<option ${i===1?'selected':''}>${n}</option>`).join('');
+const armA=r=>(rnd()<.75?0:Math.PI/2)+(rnd()<.5?0:Math.PI)+2*Math.log(r/(GX.R*.08)),gs=()=>rnd()+rnd()+rnd()-1.5;
+function gSize(){
+  const r=gc.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);if(!r.width)return false;
+  gc.width=r.width*d;gc.height=r.height*d;gg.setTransform(d,0,0,d,0,0);GX.w=r.width;GX.h=r.height;
+  GX.D0=GX.R*2.7;GX.f=GX.D0*Math.min(r.width*.5,r.height*.72)/GX.R;return true;
+}
+function gAlloc(n){GX.n=n;['x','y','z','vx','vy','vz','ht','s','SX','SY','SZ'].forEach(k=>GX[k]=new Float32Array(n));GX.b=new Uint8Array(n)}
+function gSpawn(i){
+  const R=GX.R,t=rnd(),bright=i<(isMob()?60:140);let r,a,y,col,s,vr=0;
+  if(bright){r=R*(.15+.85*Math.pow(rnd(),.8));a=armA(r);y=gs()*R*.01;col=9+((rnd()*3)|0);s=2.6+rnd()*1.6}
+  else if(t<.24){r=R*(.02+.2*Math.pow(rnd(),1.5));a=rnd()*6.283;y=(rnd()-.5)*r*1.5;col=(rnd()*5)|0;s=1.3+rnd()*1.1;vr=.9}
+  else if(t<.8){r=R*(.12+.88*Math.pow(rnd(),.65));a=armA(r)+gs()*(.3+.5*r/R);y=gs()*R*.012;col=6+((rnd()*6)|0);s=1.1+rnd()*1.3}
+  else{r=R*(.1+.9*Math.pow(rnd(),.8));a=rnd()*6.283;y=gs()*R*.02;col=2+((rnd()*5)|0);s=1.1+rnd()*.9}
+  const v=Math.sqrt(GK*r*r/(r*r+GS2))*(.95+rnd()*.08);
+  GX.x[i]=Math.cos(a)*r;GX.z[i]=Math.sin(a)*r;GX.y[i]=y;GX.vx[i]=-Math.sin(a)*v+(rnd()-.5)*vr;GX.vz[i]=Math.cos(a)*v+(rnd()-.5)*vr;GX.vy[i]=(rnd()-.5)*vr;
+  GX.ht[i]=0;GX.s[i]=s;GX.b[i]=col;
+}
+function gInit(){
+  gAlloc(+$('#gCount').value);for(let i=0;i<GX.n;i++)gSpawn(i);
+  GX.rings=[];GX.sparks=[];GX.rot=0;
+  GX.neb=[...Array(isMob()?110:220)].map(()=>{const r=GX.R*(.12+.85*Math.pow(rnd(),.7));const a=(rnd()<.5?0:Math.PI)+2*Math.log(r/(GX.R*.08))+(rnd()-.5)*.5;return{x:Math.cos(a)*r,z:Math.sin(a)*r,y:gs()*GX.R*.03,rad:GX.R*(.07+rnd()*.12),c:(rnd()*3)|0,a:.05+rnd()*.07}});
+  GX.stars=[...Array(isMob()?110:240)].map(()=>{const u=rnd()*6.283,w=rnd()*2-1,q=Math.sqrt(1-w*w),d=GX.R*(5+rnd()*4);return{x:Math.cos(u)*q*d,y:w*d,z:Math.sin(u)*q*d,p:rnd()*6.28,f:.002+rnd()*.004,s:.6+rnd()*1.1}});
+  gg.fillStyle='#02030a';gg.fillRect(0,0,GX.w,GX.h);
+}
+let PX=0,PY=0,PS=0,C={};
+function pr(x,y,z){
+  const x1=x*C.cy+z*C.sy,z1=-x*C.sy+z*C.cy,y2=y*C.cp+z1*C.sp,z2=-y*C.sp+z1*C.cp+C.D;
+  if(z2<C.D*.15)return false;PS=C.f/z2;PX=C.cx+x1*PS;PY=C.cy0-y2*PS;return true;
+}
+function gWell(e){
+  const r=gc.getBoundingClientRect(),ax=(e.clientX-r.left-GX.w/2)/GX.f,ay=-(e.clientY-r.top-GX.h/2)/GX.f,D=GX.D0/GX.zoom,cp=Math.cos(GX.pitch),sp=Math.sin(GX.pitch),den=sp-ay*cp;
+  GX.mx=e.clientX-r.left;GX.my=e.clientY-r.top;GX.has=false;if(den<.03)return;
+  const t=D*sp/den;if(t<=0)return;
+  const x1=t*ax,z1=t*ay*sp+(t-D)*cp,cy=Math.cos(GX.yaw),sy=Math.sin(GX.yaw);
+  GX.wx=x1*cy-z1*sy;GX.wz=x1*sy+z1*cy;GX.has=true;
+}
+function gNova(x,z){
+  GX.rings.push({x,z,r:6,a:1});GX.flash=.7;
+  const N=GX.n;
+  for(let i=0;i<N;i++){const dx=GX.x[i]-x,dy=GX.y[i],dz=GX.z[i]-z,d=Math.hypot(dx,dy,dz)+1;if(d<GX.R*1.3){const f=Math.min(9,2200/(d+40))*(.6+rnd()*.8);GX.vx[i]+=dx/d*f;GX.vy[i]+=dy/d*f;GX.vz[i]+=dz/d*f;GX.ht[i]=1}}
+  for(let i=0;i<150;i++){const u=rnd()*6.283,w=rnd()*2-1,q=Math.sqrt(1-w*w),s=2+rnd()*7;GX.sparks.push({x,y:0,z,vx:Math.cos(u)*q*s,vy:w*s,vz:Math.sin(u)*q*s,l:1})}
+}
+function gLoop(t){
+  GX.raf=0;if(!GX.on||!GX.vis)return;GX.raf=requestAnimationFrame(gLoop);
+  if(t-GX.last<15)return;
+  const dt=Math.min(2.5,(t-GX.last)/16.67||1);GX.last=t;
+  if(!GX.ptr.size&&t-GX.idle>2500&&$('#gAuto').checked)GX.yaw+=.0006*dt;
+  const W=GX.w,H=GX.h,R=GX.R;
+  C={cx:W/2,cy0:H/2,D:GX.D0/GX.zoom,f:GX.f,cy:Math.cos(GX.yaw),sy:Math.sin(GX.yaw),cp:Math.cos(GX.pitch),sp:Math.sin(GX.pitch)};
+  gg.globalCompositeOperation='source-over';gg.fillStyle='rgba(2,3,10,.34)';gg.fillRect(0,0,W,H);
+  gg.globalCompositeOperation='lighter';
+  gg.fillStyle='rgb(200,215,255)';
+  for(const s of GX.stars){if(pr(s.x,s.y,s.z)){gg.globalAlpha=.2+.3*Math.sin(t*s.f+s.p);gg.fillRect(PX,PY,s.s,s.s)}}
+  GX.rot+=.00045*dt;const cr=Math.cos(GX.rot),sr=Math.sin(GX.rot);
+  for(const n of GX.neb){if(pr(n.x*cr+n.z*sr,n.y,-n.x*sr+n.z*cr)){const z=n.rad*PS*2;gg.globalAlpha=n.a;gg.drawImage(GSPR[n.c],PX-z/2,PY-z/2,z,z)}}
+  if(pr(0,0,0)){const pu=1+.05*Math.sin(t/700)+GX.flash*.5;let z=R*.7*PS*pu;gg.globalAlpha=.8;gg.drawImage(GSPR[3],PX-z/2,PY-z/2,z,z);z=R*.22*PS*pu;gg.globalAlpha=1;gg.drawImage(GSPR[4],PX-z/2,PY-z/2,z,z)}
+  GX.flash*=.93;gg.globalAlpha=1;
+  if(GX.act){gg.fillStyle='rgba(150,170,255,.18)';gg.beginPath();gg.arc(GX.mx,GX.my,26,0,7);gg.fill()}
+  const N=GX.n,{x,y,z,vx,vy,vz,ht:h,s,b,SX,SY,SZ}=GX,act=GX.act&&GX.has,MR2=R*R*.3,mg=26*(R/300);
+  for(let i=0;i<N;i++){
+    const px=x[i],py=y[i],pz=z[i],d2=px*px+py*py+pz*pz,k=GK/(d2+GS2)*dt;
+    vx[i]-=px*k;vy[i]-=py*k;vz[i]-=pz*k;
+    if(act){const mx=GX.wx-px,my=-py,mz=GX.wz-pz,m2=mx*mx+my*my+mz*mz;if(m2<MR2){const f=mg/(m2+1200)*dt;vx[i]+=mx*f;vy[i]+=my*f;vz[i]+=mz*f;if(m2<MR2*.12&&h[i]<.3)h[i]=.3}}
+    const sp=vx[i]*vx[i]+vy[i]*vy[i]+vz[i]*vz[i];if(sp>100){const q=10/Math.sqrt(sp);vx[i]*=q;vy[i]*=q;vz[i]*=q}
+    x[i]+=vx[i]*dt;y[i]+=vy[i]*dt;z[i]+=vz[i]*dt;h[i]*=.975;
+    const d=Math.sqrt(d2);if(d<8||d>R*2.3){gSpawn(i);SZ[i]=0;continue}
+    if(pr(x[i],y[i],z[i])){SX[i]=PX;SY[i]=PY;SZ[i]=Math.max(.7,Math.min(5,s[i]*PS*1.15*(h[i]>.25?1.6:1)))}else SZ[i]=0;
+  }
+  for(let bk=0;bk<13;bk++){gg.fillStyle=GCOL[bk];for(let i=0;i<N;i++){if(SZ[i]>0&&(h[i]>.25?12:b[i])===bk)gg.fillRect(SX[i],SY[i],SZ[i],SZ[i])}}
+  const K=Math.min(N,isMob()?60:140);gg.globalAlpha=.45;
+  for(let i=0;i<K;i++){if(SZ[i]>0){const g=SZ[i]*9;gg.drawImage(GSPR[4],SX[i]-g/2,SY[i]-g/2,g,g)}}
+  gg.globalAlpha=1;
+  for(let i=Math.floor(N*.0004*dt+rnd());i>0;i--)gSpawn((rnd()*N)|0);
+  GX.sparks=GX.sparks.filter(q=>q.l>0);
+  for(const q of GX.sparks){q.x+=q.vx*dt;q.y+=q.vy*dt;q.z+=q.vz*dt;q.vx*=.985;q.vy*=.985;q.vz*=.985;q.l-=.012*dt;
+    if(pr(q.x,q.y,q.z)){gg.fillStyle=`rgba(255,${150+q.l*90|0},110,${Math.max(0,q.l).toFixed(2)})`;gg.fillRect(PX,PY,Math.max(1.2,2.4*PS),Math.max(1.2,2.4*PS))}}
+  GX.rings=GX.rings.filter(o=>o.a>.02);
+  for(const o of GX.rings){
+    o.r+=9*dt;o.a-=.018*dt;gg.strokeStyle=`rgba(255,220,170,${Math.max(0,o.a)})`;gg.lineWidth=2.5;gg.beginPath();
+    for(let k=0;k<=48;k++){const a=k/48*6.283;if(pr(o.x+Math.cos(a)*o.r,0,o.z+Math.sin(a)*o.r)){k?gg.lineTo(PX,PY):gg.moveTo(PX,PY)}}
+    gg.stroke();
+  }
+  if(GX.flash>.02){gg.fillStyle=`rgba(255,235,210,${GX.flash*.22})`;gg.fillRect(0,0,W,H)}
+}
+const gKick=()=>{if(GX.on&&GX.vis&&!GX.raf){GX.last=performance.now();GX.raf=requestAnimationFrame(gLoop)}};
+function gStart(){GX.on=true;if(!gSize())return;if(!GX.n)gInit();gKick()}
+function gStop(){GX.on=false;cancelAnimationFrame(GX.raf);GX.raf=0}
+gc.addEventListener('pointerdown',e=>{
+  try{gc.setPointerCapture(e.pointerId)}catch(_){}
+  GX.ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});GX.moved=0;GX.sx=e.clientX;GX.sy=e.clientY;GX.idle=performance.now();GX.pd=0;gWell(e);
+  if($('#gMode').value==='stir')GX.act=true;
+});
+gc.addEventListener('pointermove',e=>{
+  GX.idle=performance.now();const p=GX.ptr.get(e.pointerId);
+  if(!p){gWell(e);GX.act=true;return}
+  const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
+  if(GX.ptr.size===2){const[a,c]=[...GX.ptr.values()],nd=Math.hypot(a.x-c.x,a.y-c.y);if(GX.pd)GX.zoom=clamp(GX.zoom*nd/GX.pd,.5,3);GX.pd=nd;GX.moved=1;return}
+  if(Math.hypot(e.clientX-GX.sx,e.clientY-GX.sy)>5)GX.moved=1;
+  if($('#gMode').value==='rotate'){GX.yaw+=dx*.006;GX.pitch=clamp(GX.pitch+dy*.006,-1.5,1.5);GX.act=false}else{gWell(e);GX.act=true}
+});
+const gUp=e=>{
+  const had=GX.ptr.delete(e.pointerId);GX.pd=0;
+  if(had&&e.type==='pointerup'&&!GX.moved&&!GX.ptr.size){gWell(e);gNova(GX.has?GX.wx:0,GX.has?GX.wz:0)}
+  if(e.pointerType!=='mouse')GX.act=false;
+};
+gc.addEventListener('pointerup',gUp);gc.addEventListener('pointercancel',gUp);
+gc.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')GX.act=false});
+gc.addEventListener('wheel',e=>{e.preventDefault();GX.zoom=clamp(GX.zoom*(e.deltaY<0?1.08:.93),.5,3)},{passive:false});
+$('#gCount').onchange=gInit;$('#gReset').onclick=()=>{GX.yaw=.4;GX.pitch=.95;GX.zoom=1;gSize();gInit()};
+
+/* ---------- Fluid simulation ---------- */
+const fc=$('#fluid'),fg=fc.getContext('2d'),FL={on:false,vis:true,raf:0,last:0,px:0,py:0,pm:0,seen:0,hue:0};
+const hsv=(h,s,v)=>{h=(((h%360)+360)%360)/60;const i=h|0,f=h-i,p=v*(1-s),q=v*(1-s*f),t=v*(1-s*(1-f));return[[v,t,p],[q,v,p],[p,v,t],[p,q,v],[t,p,v],[v,p,q]][i%6]};
+const LUT=new Uint8ClampedArray(1100);for(let i=0;i<1100;i++)LUT[i]=255*Math.pow(1-Math.exp(-i/400*1.7),.82);
+function fInit(){
+  const r=fc.getBoundingClientRect(),dpr=1;if(!r.width)return false;
+  fc.width=Math.round(r.width*dpr);fc.height=Math.round(r.height*dpr);FL.w=fc.width;FL.h=fc.height;
+  const m=isMob();FL.nx=m?80:150;FL.ny=Math.max(30,Math.round(FL.nx*r.height/r.width));FL.dx=m?240:420;FL.dy=Math.max(80,Math.round(FL.dx*r.height/r.width));
+  const n=(FL.nx+2)*(FL.ny+2),A=()=>new Float32Array(n),D=()=>new Float32Array(FL.dx*FL.dy);
+  Object.assign(FL,{u:A(),v:A(),u0:A(),v0:A(),p:A(),dv:A(),cu:A(),r:D(),g:D(),b:D(),r0:D(),g0:D(),b0:D()});
+  FL.off=document.createElement('canvas');FL.off.width=FL.dx;FL.off.height=FL.dy;FL.octx=FL.off.getContext('2d');FL.img=FL.octx.createImageData(FL.dx,FL.dy);FL.u32=new Uint32Array(FL.img.data.buffer);
+  for(let i=0;i<3;i++)fSplat(.2+rnd()*.6,.2+rnd()*.6,(rnd()-.5)*8,(rnd()-.5)*8,200+rnd()*120,.9,.04);
+  return true;
+}
+function fSplat(xn,yn,vx,vy,hue,k,rad){
+  const [cr,cg,cb]=hsv(hue,.88,1),W=FL.nx+2,Rv=FL.nx*(rad||.022),x=xn*FL.nx+.5,y=yn*FL.ny+.5;
+  for(let j=Math.max(1,(y-Rv*2.5)|0);j<=Math.min(FL.ny,(y+Rv*2.5)|0);j++)for(let i=Math.max(1,(x-Rv*2.5)|0);i<=Math.min(FL.nx,(x+Rv*2.5)|0);i++){
+    const f=Math.exp(-((i-x)*(i-x)+(j-y)*(j-y))/(Rv*Rv)*1.2),q=i+W*j;FL.u[q]+=vx*f;FL.v[q]+=vy*f;
+  }
+  const s=FL.dx/FL.nx,Rd=Rv*s,X=xn*FL.dx,Y=yn*FL.dy,DX=FL.dx;
+  for(let j=Math.max(0,(Y-Rd*2.5)|0);j<Math.min(FL.dy,(Y+Rd*2.5)|0);j++)for(let i=Math.max(0,(X-Rd*2.5)|0);i<Math.min(DX,(X+Rd*2.5)|0);i++){
+    const f=Math.exp(-((i-X)*(i-X)+(j-Y)*(j-Y))/(Rd*Rd)*1.2)*k,q=i+DX*j;
+    FL.r[q]=Math.min(2.4,FL.r[q]+cr*f);FL.g[q]=Math.min(2.4,FL.g[q]+cg*f);FL.b[q]=Math.min(2.4,FL.b[q]+cb*f);
+  }
+}
+function bnd(b,x){
+  const nx=FL.nx,ny=FL.ny,W=nx+2;
+  for(let i=1;i<=nx;i++){x[i]=b===2?-x[i+W]:x[i+W];x[i+W*(ny+1)]=b===2?-x[i+W*ny]:x[i+W*ny]}
+  for(let j=1;j<=ny;j++){x[W*j]=b===1?-x[1+W*j]:x[1+W*j];x[nx+1+W*j]=b===1?-x[nx+W*j]:x[nx+W*j]}
+}
+function adv(d,d0,u,v,dt){
+  const nx=FL.nx,ny=FL.ny,W=nx+2;
+  for(let j=1;j<=ny;j++)for(let i=1;i<=nx;i++){
+    const k=i+W*j;let x=i-dt*u[k],y=j-dt*v[k];
+    x=x<.5?.5:x>nx+.5?nx+.5:x;y=y<.5?.5:y>ny+.5?ny+.5:y;
+    const i0=x|0,j0=y|0,s1=x-i0,t1=y-j0,s0=1-s1,t0=1-t1,a=i0+W*j0;
+    d[k]=s0*(t0*d0[a]+t1*d0[a+W])+s1*(t0*d0[a+1]+t1*d0[a+W+1]);
+  }
+}
+function advDye(dt,dis){
+  const {nx,ny,dx,dy,u,v,r,g,b,r0,g0,b0}=FL,W=nx+2,sx=nx/dx,sy=ny/dy,kx=dx/nx*dt,ky=dy/ny*dt,mx=dx-1.001,my=dy-1.001;
+  for(let j=0;j<dy;j++){
+    const yv=(j+.5)*sy+.5,jv=yv|0,ty=yv-jv,uy=1-ty;
+    for(let i=0;i<dx;i++){
+      const xv=(i+.5)*sx+.5,iv=xv|0,tx=xv-iv,a=iv+W*jv,ux=1-tx;
+      const U=uy*(ux*u[a]+tx*u[a+1])+ty*(ux*u[a+W]+tx*u[a+W+1]),V=uy*(ux*v[a]+tx*v[a+1])+ty*(ux*v[a+W]+tx*v[a+W+1]);
+      let x=i-U*kx,y=j-V*ky;x=x<0?0:x>mx?mx:x;y=y<0?0:y>my?my:y;
+      const i0=x|0,j0=y|0,s1=x-i0,t1=y-j0,s0=1-s1,t0=1-t1,q=i0+dx*j0,q1=q+dx,o=i+dx*j;
+      const w00=s0*t0*dis,w10=s1*t0*dis,w01=s0*t1*dis,w11=s1*t1*dis;
+      r[o]=w00*r0[q]+w10*r0[q+1]+w01*r0[q1]+w11*r0[q1+1];
+      g[o]=w00*g0[q]+w10*g0[q+1]+w01*g0[q1]+w11*g0[q1+1];
+      b[o]=w00*b0[q]+w10*b0[q+1]+w01*b0[q1]+w11*b0[q1+1];
+    }
+  }
+}
+function fStep(dt){
+  const {nx,ny,u,v,u0,v0,p,dv,cu}=FL,W=nx+2;
+  for(let j=1;j<=ny;j++)for(let i=1;i<=nx;i++){const k=i+W*j;cu[k]=(v[k+1]-v[k-1]-(u[k+W]-u[k-W]))*.5}
+  for(let j=2;j<ny;j++)for(let i=2;i<nx;i++){
+    const k=i+W*j,gx=(Math.abs(cu[k+1])-Math.abs(cu[k-1]))*.5,gy=(Math.abs(cu[k+W])-Math.abs(cu[k-W]))*.5,l=Math.hypot(gx,gy)+1e-5;
+    u[k]+=.4*gy/l*cu[k]*dt;v[k]-=.4*gx/l*cu[k]*dt;
+  }
+  u0.set(u);v0.set(v);adv(u,u0,u0,v0,dt);adv(v,v0,u0,v0,dt);bnd(1,u);bnd(2,v);
+  for(let j=1;j<=ny;j++)for(let i=1;i<=nx;i++){const k=i+W*j;dv[k]=-.5*(u[k+1]-u[k-1]+v[k+W]-v[k-W])}
+  bnd(0,dv);bnd(0,p);
+  for(let it=0;it<10;it++){for(let j=1;j<=ny;j++)for(let i=1;i<=nx;i++){const k=i+W*j;p[k]=(dv[k]+p[k-1]+p[k+1]+p[k-W]+p[k+W])*.25}bnd(0,p)}
+  for(let j=1;j<=ny;j++)for(let i=1;i<=nx;i++){const k=i+W*j;u[k]-=.5*(p[k+1]-p[k-1]);v[k]-=.5*(p[k+W]-p[k-W])}
+  bnd(1,u);bnd(2,v);
+  [FL.r,FL.r0]=[FL.r0,FL.r];[FL.g,FL.g0]=[FL.g0,FL.g];[FL.b,FL.b0]=[FL.b0,FL.b];advDye(dt,.9955);
+  for(let k=0;k<u.length;k++){u[k]*=.9985;v[k]*=.9985}
+}
+function fDraw(){
+  const {dx,dy,r,g,b,u32}=FL,n=dx*dy;
+  for(let k=0;k<n;k++){u32[k]=0xff000000|((12+LUT[(b[k]*400)|0]*.95)|0)<<16|((4+LUT[(g[k]*400)|0]*.985)|0)<<8|((3+LUT[(r[k]*400)|0]*.985)|0)}
+  FL.octx.putImageData(FL.img,0,0);fg.imageSmoothingEnabled=true;fg.drawImage(FL.off,0,0,FL.w,FL.h);
+}
+function fLoop(t){
+  FL.raf=0;if(!FL.on||!FL.vis||!FL.u)return;FL.raf=requestAnimationFrame(fLoop);
+  if(t-FL.last<15)return;
+  const dt=Math.min(1.6,(t-FL.last)/16.67||1);FL.last=t;FL.hue+=.004*dt;
+  if($('#fAuto').checked&&t-FL.seen>1800&&rnd()<.018){const a=rnd()*6.283;fSplat(.1+rnd()*.8,.15+rnd()*.7,Math.cos(a)*6,Math.sin(a)*6,230+Math.sin(FL.hue)*90,.75,.03)}
+  fStep(dt);fDraw();
+}
+const fKick=()=>{if(FL.on&&FL.vis&&FL.u&&!FL.raf){FL.last=performance.now();FL.raf=requestAnimationFrame(fLoop)}};
+function fStart(){FL.on=true;if(!FL.u&&!fInit())return;fKick()}
+function fStop(){FL.on=false;cancelAnimationFrame(FL.raf);FL.raf=0}
+const fPos=e=>{const r=fc.getBoundingClientRect();return[(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]};
+fc.addEventListener('pointermove',e=>{
+  if(!FL.u)return;const[x,y]=fPos(e);
+  if(FL.pm){const dx=(x-FL.px)*FL.nx,dy=(y-FL.py)*FL.nx,sp=Math.hypot(dx,dy);
+    if(sp>.05){fSplat(x,y,dx*.8,dy*.8,200+Math.min(sp,7)/7*150+Math.sin(FL.hue)*25,.3+Math.min(sp,7)*.05,.02)}}
+  FL.px=x;FL.py=y;FL.pm=1;FL.seen=performance.now();
+});
+fc.addEventListener('pointerleave',()=>FL.pm=0);
+fc.addEventListener('pointerdown',e=>{
+  if(!FL.u)return;const[x,y]=fPos(e);FL.px=x;FL.py=y;FL.pm=1;FL.seen=performance.now();
+  for(let k=0;k<12;k++){const a=k/12*6.283;fSplat(x+Math.cos(a)*.012,y+Math.sin(a)*.02,Math.cos(a)*5,Math.sin(a)*5,k*30+FL.hue*50,.55,.02)}
+});
+$('#fClear').onclick=fInit;
+const io=new IntersectionObserver(es=>es.forEach(e=>{const g=e.target.id==='galaxy';(g?GX:FL).vis=e.isIntersecting;(g?gKick:fKick)()}),{threshold:.05});io.observe(gc);io.observe(fc);
+let LW=innerWidth,RT;addEventListener('resize',()=>{clearTimeout(RT);RT=setTimeout(()=>{if(innerWidth!==LW){LW=innerWidth;if(GX.on&&gSize())gInit();if(FL.on)fInit()}},250)});
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-fs]');if(!b)return;
+  const c=$('#'+b.dataset.fs),on=c.classList.toggle('fs');document.body.classList.toggle('fsm',on);b.textContent=on?'Close':'Expand';
+  setTimeout(()=>{if(gSize())gInit();if(FL.on)fInit()},80);
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const f=$('.card.fs');if(f)f.querySelector('[data-fs]').click()}});
+
+
+
+/* ---------- Home, focus mode, palette, breathing ---------- */
+const TITLES={home:'Home',focus:'Focus',planner:'Study planner',calendar:'Calendar',stats:'Stats',relax:'Relax',settings:'Settings'};
+const QUOTES=['Small steps, repeated daily, add up faster than you expect.','Start with ten minutes. Momentum does the rest.','Done is a better starting point than perfect.','Protect your focus like you protect your time.','One clear task beats five half-started ones.','Rest is part of the work, not a break from it.','Consistency quietly outruns intensity.','Decide the next step, then take it.'];
+function renderHome(){
+  const h=new Date().getHours(),g=h<5?'Still up':h<12?'Good morning':h<17?'Good afternoon':h<21?'Good evening':'Good night',t=TODAY();
+  $('#hGreet').textContent=g+(S.settings.name?', '+S.settings.name:'');
+  $('#hDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  $('#hQuote').textContent=QUOTES[Math.floor(Date.now()/864e5)%QUOTES.length];
+  const ev=evOn(t),open=S.tasks.filter(x=>!x.done).sort((a,b)=>a.pri-b.pri);
+  $('#hKpis').innerHTML=[['Focused today',day(t).min+' min'],['Streak',streak()+' days'],['Open tasks',open.length],['Events today',ev.length]].map(([k,v])=>`<div class="kpi"><small>${k}</small><b>${v}</b></div>`).join('');
+  const hs=hol(t);
+  $('#hSched').innerHTML=(hs.length||ev.length)?hs.map(x=>`<div class="li"><span class="dot" style="background:${x[1]==='g'?'#34d399':'#fbbf24'}"></span>${esc(x[0])}</div>`).join('')+ev.map(e=>`<div class="li" data-eid="${e.id}"><span class="dot" style="background:${e.c}"></span><span style="flex:1">${esc(e.t)}</span><span class="pill">${e.all?'All day':e.s}</span></div>`).join(''):'<p class="muted">Nothing scheduled today.</p>';
+  $('#hTaskN').textContent=open.length+' open';
+  $('#hTasks').innerHTML=open.length?open.slice(0,5).map(x=>`<div class="li" data-tid="${x.id}"><span class="dot" style="background:${PRI[x.pri]}"></span><span style="flex:1">${esc(x.text)}</span>${x.tag?`<span class="pill">${esc(x.tag)}</span>`:''}</div>`).join(''):'<p class="muted">No open tasks. Add some in Focus.</p>';
+  let dl=null;for(let i=0;i<365&&!dl;i++){const d=addDays(t,i);if(d>CMAX)break;const e=evOn(d).find(x=>x.k==='Deadline'&&!x.done);if(e)dl=[d,e,i]}
+  $('#hDead').innerHTML=dl?`<div class="li" data-eid="${dl[1].id}"><span class="dot" style="background:${dl[1].c}"></span><span style="flex:1">${esc(dl[1].t)}</span><span class="pill">${dl[2]?'in '+dl[2]+' day'+(dl[2]>1?'s':''):'today'}</span></div>`:'<p class="muted">No upcoming deadlines. Add one in the calendar.</p>';
+}
+$('#home').onclick=e=>{
+  const a=e.target.closest('[data-eid]');if(a){show('calendar');openEv(a.dataset.eid);return}
+  const b=e.target.closest('[data-tid]');if(b){S.active=b.dataset.tid;renderTasks();show('focus')}
+};
+$('#hStart').onclick=()=>{show('focus');start()};$('#hEvent').onclick=()=>{show('calendar');openEv(null,TODAY())};$('#hRelax').onclick=()=>show('relax');
+function ping(m){if(S.settings.notify&&window.Notification&&Notification.permission==='granted'){try{new Notification('Focus Hub',{body:m})}catch(e){}}}
+function zen(on){
+  document.body.classList.toggle('zen',on);
+  if(on){show('focus');try{document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}}
+  else if(document.fullscreenElement)document.exitFullscreen();
+}
+$('#zenBtn').onclick=()=>zen(true);$('#zenX').onclick=()=>zen(false);
+setInterval(()=>{$('#zClock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:!S.settings.h24})},1000);
+const PALS=[['#7c5cff','#22d3ee'],['#f97316','#ec4899'],['#22c55e','#eab308'],['#3b82f6','#a855f7'],['#ef4444','#f59e0b'],['#14b8a6','#6366f1'],['#ec4899','#8b5cf6'],['#e5e5e5','#a3a3a3']];
+function renderPals(){$('#pals').innerHTML=PALS.map((p,i)=>`<button class="pal" data-pal="${i}" title="Palette ${i+1}" style="background:linear-gradient(135deg,${p[0]},${p[1]})"></button>`).join('')}
+$('#pals').onclick=e=>{const b=e.target.closest('[data-pal]');if(!b)return;const p=PALS[+b.dataset.pal];S.settings.accent=p[0];S.settings.accent2=p[1];applyTheme();save();renderSettings()};
+let PI=0,PL=[];
+const ACTS=()=>[
+  ...Object.entries(TITLES).map(([v,n])=>({n:'Go to '+n,f:()=>show(v)})),
+  {n:'Start or pause timer',f:toggle},{n:'Reset timer',f:()=>reset()},{n:'Toggle focus mode',f:()=>zen(!document.body.classList.contains('zen'))},
+  {n:'New calendar event',f:()=>{show('calendar');openEv(null,TODAY())}},{n:'Add a task',f:()=>{show('focus');$('#newTask').focus()}},
+  ...Object.entries(SOUNDS).map(([k,o])=>({n:'Toggle sound: '+o.n,f:()=>mixSet(k,!MIX[k])})),
+  {n:'Stop all sounds',f:()=>$('#sStop').click()},{n:'Start breathing exercise',f:()=>{show('relax');if(!BR)breathe()}},
+  ...Object.keys(PRESETS).map(k=>({n:'Theme: '+k,f:()=>{S.settings.theme=k;S.settings.accent=null;S.settings.accent2=null;applyTheme();save();renderSettings()}})),
+  {n:'Export backup',f:()=>$('#exportBtn').click()}];
+function palRender(){
+  const q=$('#palQ').value.toLowerCase();PL=ACTS().filter(a=>a.n.toLowerCase().includes(q));PI=Math.min(PI,Math.max(0,PL.length-1));
+  $('#palList').innerHTML=PL.map((a,i)=>`<div class="pi ${i===PI?'on':''}" data-i="${i}">${esc(a.n)}</div>`).join('')||'<div class="pi muted">No matches</div>';
+}
+function openPal(){$('#pal').classList.add('on');$('#palQ').value='';PI=0;palRender();$('#palQ').focus()}
+function closePal(){$('#pal').classList.remove('on')}
+function runPal(i){const a=PL[i];closePal();if(a)a.f()}
+$('#palBtn').onclick=openPal;$('#palQ').oninput=()=>{PI=0;palRender()};
+$('#palQ').onkeydown=e=>{e.stopPropagation();
+  if(e.key==='ArrowDown'){PI=Math.min(PL.length-1,PI+1);palRender();e.preventDefault()}
+  else if(e.key==='ArrowUp'){PI=Math.max(0,PI-1);palRender();e.preventDefault()}
+  else if(e.key==='Enter')runPal(PI)};
+$('#palList').onclick=e=>{const p=e.target.closest('[data-i]');if(p)runPal(+p.dataset.i)};
+$('#pal').onclick=e=>{if(e.target.id==='pal')closePal()};
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openPal()}
+  if(e.key==='Escape'){closePal();if(document.body.classList.contains('zen'))zen(false)}
+});
+let BR=null;
+function breathe(){
+  const c=$('#bCircle');
+  if(BR){clearTimeout(BR.t);BR=null;$('#bBtn').textContent='Start';$('#bTxt').textContent='Ready';c.style.transition='transform .6s';c.style.transform='scale(.5)';return}
+  const p=$('#bPat').value.split(',').map(Number),steps=[['Inhale',p[0],1],['Hold',p[1],1],['Exhale',p[2],.5],['Hold',p[3],.5]].filter(s=>s[1]>0);
+  let i=0;BR={};$('#bBtn').textContent='Stop';
+  const go=()=>{const [n,sec,sc]=steps[i++%steps.length];$('#bTxt').textContent=n;c.style.transition=`transform ${n==='Hold'?0:sec}s ease-in-out`;c.style.transform=`scale(${sc})`;BR.t=setTimeout(go,sec*1000)};go();
+}
+$('#bBtn').onclick=breathe;
+
+renderAll();
+</script>
+</body>
+</html>
